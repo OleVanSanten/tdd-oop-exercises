@@ -5,10 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using TestTools.Structure;
-using TestTools.Unit;
-using static TestTools.Unit.TestExpression;
+using TestTools.Expressions;
+using static TestTools.Expressions.TestExpression;
 using static Lecture_6_Tests.TestHelper;
 using static TestTools.Helpers.StructureHelper;
+using TestTools.MSTest;
 using System.IO.Abstractions;
 
 namespace Lecture_6_Tests
@@ -39,7 +40,7 @@ namespace Lecture_6_Tests
 
         private void TestSetup()
         {
-            IFileSystem fs = new FileSystem();
+            FileSystem fs = new FileSystem();
             fs.File.WriteAllText("./file.txt", "content of file");
         }
 

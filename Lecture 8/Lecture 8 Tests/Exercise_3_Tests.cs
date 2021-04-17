@@ -4,9 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using TestTools.Unit;
+using TestTools.Expressions;
+using TestTools.MSTest;
 using TestTools.Structure;
-using static TestTools.Unit.TestExpression;
+using static TestTools.Expressions.TestExpression;
 using static Lecture_8_Tests.TestHelper;
 using static TestTools.Helpers.StructureHelper;
 

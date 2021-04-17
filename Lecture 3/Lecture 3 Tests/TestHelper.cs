@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TestTools;
-using TestTools.Unit;
-using System.Linq.Expressions;
+﻿using TestTools.MSTest;
 
 namespace Lecture_3_Tests
 {

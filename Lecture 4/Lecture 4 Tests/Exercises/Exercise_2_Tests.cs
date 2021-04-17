@@ -1,9 +1,10 @@
 ﻿using Lecture_4_Solutions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using TestTools.Expressions;
+using TestTools.MSTest;
 using TestTools.Structure;
-using TestTools.Unit;
-using static TestTools.Unit.TestExpression;
+using static TestTools.Expressions.TestExpression;
 using static Lecture_4_Tests.TestHelper;
 using static TestTools.Helpers.StructureHelper;
 

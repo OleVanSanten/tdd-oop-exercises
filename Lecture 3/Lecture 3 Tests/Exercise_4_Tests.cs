@@ -1,10 +1,9 @@
 ﻿using Lecture_3_Solutions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TestTools.Unit;
-using TestTools;
-using TestTools.Structure;
+using TestTools.Expressions;
+using TestTools.MSTest;
 using static Lecture_3_Tests.TestHelper;
-using static TestTools.Unit.TestExpression;
+using static TestTools.Expressions.TestExpression;
 
 namespace Lecture_3_Tests
 {

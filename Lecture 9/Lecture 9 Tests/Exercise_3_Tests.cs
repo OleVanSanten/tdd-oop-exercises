@@ -3,12 +3,11 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
+using TestTools.Expressions;
+using TestTools.MSTest;
 using TestTools.Structure;
-using TestTools.Unit;
-using static TestTools.Unit.TestExpression;
 using static Lecture_9_Tests.TestHelper;
-using static TestTools.Helpers.StructureHelper;
+using static TestTools.Expressions.TestExpression;
 
 namespace Lecture_9_Tests
 {

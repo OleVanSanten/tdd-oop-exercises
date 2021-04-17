@@ -1,13 +1,12 @@
 ﻿using Lecture_7_Solutions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
-using System.Text;
-using TestTools.Structure;
-using TestTools.Unit;
-using static TestTools.Unit.TestExpression;
-using static Lecture_7_Tests.TestHelper;
 using System.Collections;
+using TestTools.Expressions;
+using TestTools.MSTest;
+using TestTools.Structure;
+using static Lecture_7_Tests.TestHelper;
+using static TestTools.Expressions.TestExpression;
 
 namespace Lecture_7_Tests
 {

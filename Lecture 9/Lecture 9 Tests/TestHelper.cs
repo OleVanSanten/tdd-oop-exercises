@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using TestTools;
-using TestTools.Unit;
+using TestTools.MSTest;
 using System.Linq.Expressions;
 
 namespace Lecture_9_Tests
