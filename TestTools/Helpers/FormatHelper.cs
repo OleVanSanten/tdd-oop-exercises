@@ -11,7 +11,7 @@ namespace TestTools.Helpers
     {
         private readonly static Dictionary<Type, Func<object, string>> LiteralRepresentations = new Dictionary<Type, Func<object, string>>()
         {
-            [null] = (o) => "null",
+            //[null] = (o) => "null",
             [typeof(bool)] = (o) => ((bool)o).ToString(),
             [typeof(byte)] = (o) => $"(byte){(byte)o}",
             [typeof(char)] = (o) => $"'{(char)o}'",

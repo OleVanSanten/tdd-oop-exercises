@@ -7,6 +7,9 @@
     <IsPackable>false</IsPackable>
     <UseNETCoreGenerator>true</UseNETCoreGenerator>
     <IncludeBuildOutput>true</IncludeBuildOutput>
+
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\GeneratedFiles</CompilerGeneratedFilesOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,6 +23,13 @@
     <PackageReference Include="System.Runtime" Version="4.3.1" />
   </ItemGroup>
 
+  <!-- Adds TestTools as source generator -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\TestTools\TestTools.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="true" />
+  </ItemGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\..\TestTools.MSTest\TestTools.MSTest.csproj" />
     <ProjectReference Include="..\..\TestTools\TestTools.csproj" />
