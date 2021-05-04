@@ -44,6 +44,7 @@ namespace TestTools.Templates
             {
                 var model = context.Compilation.GetSemanticModel(node.SyntaxTree);
                 var symbol = model.GetDeclaredSymbol(node, context.CancellationToken) as ITypeSymbol;
+                var @namespace = symbol.ContainingNamespace;
 
                 var attributeData = symbol?.GetAttributes().FirstOrDefault(x => x.AttributeClass.BaseType.Equals(attributeMetadata, SymbolEqualityComparer.Default));
 
