@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure
 {
     public interface IMemberTranslator
     {
-        Type TargetType { get; set; }
+        TypeDescription TargetType { get; set; }
         VerifierServiceBase Verifier { get; set; }
-        MemberInfo Translate(MemberInfo member);
+        MemberDescription Translate(MemberDescription member);
     }
 }

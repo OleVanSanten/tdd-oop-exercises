@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Text;
 using System.Linq;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure
 {
@@ -17,20 +17,20 @@ namespace TestTools.Structure
             _memberTranslator = new AlternateNameMemberTranslator(alternateNames);
         }
 
-        public string TargetNamespace { 
+        public NamespaceDescription TargetNamespace { 
             get => _typeTranslator.TargetNamespace; 
             set => _typeTranslator.TargetNamespace = value;
         }
 
-        public Type TargetType { 
+        public TypeDescription TargetType { 
             get => _memberTranslator.TargetType; 
             set => _memberTranslator.TargetType = value; 
         }
 
         public VerifierServiceBase Verifier { get; set; }
 
-        public Type Translate(Type type) => _typeTranslator.Translate(type);
+        public TypeDescription Translate(TypeDescription type) => _typeTranslator.Translate(type);
 
-        public MemberInfo Translate(MemberInfo member) => _memberTranslator.Translate(member);
+        public MemberDescription Translate(MemberDescription member) => _memberTranslator.Translate(member);
     }
 }

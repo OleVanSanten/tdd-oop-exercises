@@ -7,23 +7,23 @@ namespace TestTools.TypeSystem
 {
     public class RuntimeParameterDescription : ParameterDescription
     {
-        ParameterInfo _parameterInfo;
-
         public RuntimeParameterDescription(ParameterInfo parameterInfo)
         {
-            _parameterInfo = parameterInfo;
+            ParameterInfo = parameterInfo;
         }
 
-        public override object DefaultValue => _parameterInfo.DefaultValue;
+        public ParameterInfo ParameterInfo { get; }
 
-        public override bool HasDefaultValue => _parameterInfo.HasDefaultValue;
+        public override object DefaultValue => ParameterInfo.DefaultValue;
 
-        public override bool IsIn => _parameterInfo.IsIn;
+        public override bool HasDefaultValue => ParameterInfo.HasDefaultValue;
 
-        public override bool IsOut => _parameterInfo.IsOut;
+        public override bool IsIn => ParameterInfo.IsIn;
 
-        public override string Name => _parameterInfo.Name;
+        public override bool IsOut => ParameterInfo.IsOut;
 
-        public override TypeDescription ParameterType => new RuntimeTypeDescription(_parameterInfo.ParameterType);
+        public override string Name => ParameterInfo.Name;
+
+        public override TypeDescription ParameterType => new RuntimeTypeDescription(ParameterInfo.ParameterType);
     }
 }

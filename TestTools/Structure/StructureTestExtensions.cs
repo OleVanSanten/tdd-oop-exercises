@@ -63,7 +63,7 @@ namespace TestTools.Structure
 
         public static void AssertConstructor(this StructureTest test, ConstructorInfo constructorInfo, params IMemberVerifier[] verifiers)
         {
-            IMemberVerifier[] allVerifiers = verifiers.Union(new[] { new MemberTypeVerifier(MemberTypes.Constructor) }).ToArray();
+            IMemberVerifier[] allVerifiers = verifiers.Union(new[] { new MemberTypeVerifier(TypeSystem.MemberTypes.Constructor) }).ToArray();
             test.AssertMember(constructorInfo, allVerifiers);
         }
 
@@ -105,7 +105,7 @@ namespace TestTools.Structure
 
         public static void AssertEvent(this StructureTest test, EventInfo info, params IMemberVerifier[] verifiers)
         {
-            IMemberVerifier[] allVerifiers = verifiers.Union(new[] { new MemberTypeVerifier(MemberTypes.Event) }).ToArray();
+            IMemberVerifier[] allVerifiers = verifiers.Union(new[] { new MemberTypeVerifier(TypeSystem.MemberTypes.Event) }).ToArray();
             test.AssertMember(info, allVerifiers);
         }
 
@@ -116,7 +116,7 @@ namespace TestTools.Structure
 
         public static void AssertField(this StructureTest test, FieldInfo fieldInfo, params IMemberVerifier[] verifiers)
         {
-            IMemberVerifier[] allVerifiers = verifiers.Union(new[] { new MemberTypeVerifier(MemberTypes.Field) }).ToArray();
+            IMemberVerifier[] allVerifiers = verifiers.Union(new[] { new MemberTypeVerifier(TypeSystem.MemberTypes.Field) }).ToArray();
             test.AssertMember(fieldInfo, allVerifiers);
         }
 
@@ -139,7 +139,7 @@ namespace TestTools.Structure
 
         public static void AssertProperty(this StructureTest test, PropertyInfo propertyInfo, params IMemberVerifier[] verifiers)
         {
-            IMemberVerifier[] allVerifiers = verifiers.Union(new[] { new MemberTypeVerifier(MemberTypes.Property) }).ToArray();
+            IMemberVerifier[] allVerifiers = verifiers.Union(new[] { new MemberTypeVerifier(TypeSystem.MemberTypes.Property) }).ToArray();
             test.AssertMember(propertyInfo, allVerifiers);
         }
 
@@ -177,7 +177,7 @@ namespace TestTools.Structure
 
         public static void AssertMethod(this StructureTest test, MethodInfo methodInfo, params IMemberVerifier[] verifiers)
         {
-            IMemberVerifier[] allVerifiers = verifiers.Union(new[] { new MemberTypeVerifier(MemberTypes.Method) }).ToArray();
+            IMemberVerifier[] allVerifiers = verifiers.Union(new[] { new MemberTypeVerifier(TypeSystem.MemberTypes.Method) }).ToArray();
             test.AssertMember(methodInfo, allVerifiers);
         }
 

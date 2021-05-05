@@ -5,8 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using TestTools.Helpers;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure
 {
@@ -15,7 +15,6 @@ namespace TestTools.Structure
     {
         private IStructureService _structureService;
         private Compilation _compilation;
-        private Dictionary<string, Type> _cache = new Dictionary<string, Type>();
 
         public TypeRewriter(IStructureService structureService, Compilation compilation)
         {
@@ -86,24 +85,19 @@ namespace TestTools.Structure
 
         public override SyntaxNode VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
         {
-            Type objectType = GetType(node);
+            var originalType = GetTypeDescription(node);
+            var originalConstructor = GetConstructorDescription(node);
 
-            // objectType is not part of the solution assembly
-            if (objectType == null)
-                return node;
-
-            // Finding matching constructor, only based on number of parameters for now
-            ConstructorInfo[] objectConstructors = objectType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            ConstructorInfo objectConstructor = objectConstructors.First(s => s.GetParameters().Length == node.ArgumentList.Arguments.Count());
-
-            _structureService.VerifyType(objectType, TypeVerifiers);
+            _structureService.VerifyType(originalType, TypeVerifiers);
             _structureService.VerifyMember(
-                objectConstructor,
+                originalConstructor,
                 MemberVerifiers,
                 MemberVerificationAspect.MemberType,
                 MemberVerificationAspect.ConstructorAccessLevel);
 
-            return node.WithType(GetTypeSyntax(_structureService.TranslateType(objectType)));
+            var translatedType = (CompileTimeTypeDescription)_structureService.TranslateType(originalType);
+            var newType = SyntaxFactory.ParseTypeName(translatedType.FullName);
+            return node.WithType(newType);
         }
 
         public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
@@ -113,60 +107,54 @@ namespace TestTools.Structure
             if (memberExpression == null)
                 return node;
 
-            Type objectType = GetType(memberExpression.Expression);
-            string objectMethodName = memberExpression.Name.ToString();
+            var originalType = GetTypeDescription(memberExpression.Expression);
+            var originalMethod = GetMethodDescription(node);
 
-            // objectType is not part of the solution assembly
-            if (objectType != null)
-            {
-                // Finding matching method, only based on number of parameters for now
-                var objectMethods = objectType.GetAllMembers().OfType<MethodInfo>();
-                MethodInfo objectMethod = objectMethods.First(s => s.Name == objectMethodName && s.GetParameters().Length == node.ArgumentList.Arguments.Count());
+            _structureService.VerifyType(originalType, TypeVerifiers);
+            _structureService.VerifyMember(
+                originalMethod,
+                MemberVerifiers,
+                MemberVerificationAspect.MemberType,
+                MemberVerificationAspect.MethodDeclaringType,
+                MemberVerificationAspect.MethodReturnType,
+                MemberVerificationAspect.MethodIsStatic,
+                MemberVerificationAspect.MethodIsAbstract,
+                MemberVerificationAspect.MethodIsVirtual,
+                MemberVerificationAspect.MethodAccessLevel);
 
-                _structureService.VerifyType(objectType, TypeVerifiers);
-                _structureService.VerifyMember(
-                    objectMethod,
-                    MemberVerifiers,
-                    MemberVerificationAspect.MemberType,
-                    MemberVerificationAspect.MethodDeclaringType,
-                    MemberVerificationAspect.MethodReturnType,
-                    MemberVerificationAspect.MethodIsStatic,
-                    MemberVerificationAspect.MethodIsAbstract,
-                    MemberVerificationAspect.MethodIsVirtual,
-                    MemberVerificationAspect.MethodAccessLevel);
-            }
+            // Potentially rewritting expression and method name 
+            var translatedMethod = (CompileTimeMethodDescription)_structureService.TranslateMember(originalMethod);
+            var newName = SyntaxFactory.IdentifierName(translatedMethod.Name);
+            var newMemberExpression = (MemberAccessExpressionSyntax)Visit(memberExpression);
+            var newExpression = newMemberExpression.WithName(newName);
 
+            // Potentially rewritting method arguments
             var newArguments = SyntaxFactory.SeparatedList(node.ArgumentList.Arguments.Select(Visit).OfType<ArgumentSyntax>());
             var newArgumentList = node.ArgumentList.WithArguments(newArguments);
-            return node.WithArgumentList(newArgumentList);
+            
+            return node.WithExpression(newExpression).WithArgumentList(newArgumentList);
         }
 
         public override SyntaxNode VisitMemberAccessExpression(MemberAccessExpressionSyntax node)
         {
-            Type type = GetType(node.Expression);
+            var originalType = GetTypeDescription(node.Expression);
+            var originalMember = GetFieldOrPropertyDescription(node);
 
-            // objectType is not part of the solution assembly
-            if (type == null)
-                return node;
-
-            string memberName = node.Name.ToString();
-            MemberInfo member = type.GetAllMembers().First(m => m.Name == memberName);
-
-            _structureService.VerifyType(type, TypeVerifiers);
-            if (member is FieldInfo)
+            _structureService.VerifyType(originalType, TypeVerifiers);
+            if (originalMember is FieldDescription)
             {
                 _structureService.VerifyMember(
-                    member,
+                    originalMember,
                     MemberVerifiers,
                     MemberVerificationAspect.FieldType,
                     MemberVerificationAspect.FieldIsStatic,
                     MemberVerificationAspect.FieldWriteability,
                     MemberVerificationAspect.FieldAccessLevel);
             }
-            else if (member is PropertyInfo)
+            else if (originalMember is PropertyDescription)
             {
                 _structureService.VerifyMember(
-                       member,
+                       originalMember,
                        MemberVerifiers,
                        MemberVerificationAspect.PropertyType,
                        MemberVerificationAspect.PropertyIsStatic,
@@ -175,50 +163,73 @@ namespace TestTools.Structure
                        MemberVerificationAspect.PropertySetIsVirtual,
                        MemberVerificationAspect.PropertySetAccessLevel);
             }
-            return base.VisitMemberAccessExpression(node);
+
+            // Potentially rewritting member name
+            var translatedMember = _structureService.TranslateMember(originalMember);
+            var newName = SyntaxFactory.IdentifierName(translatedMember.Name);
+
+            // Potentially rewritting expression
+            var newExpression = (ExpressionSyntax)Visit(node.Expression);
+
+            return node.WithName(newName).WithExpression(newExpression);
         }
 
         public override SyntaxNode VisitVariableDeclaration(VariableDeclarationSyntax node)
         {
-            Type type = GetType(node.Type);
+            var originalType = GetTypeDescription(node.Type);
 
-            // objectType is not part of the solution assembly
-            if (type == null)
-                return node;
+            _structureService.VerifyType(originalType, TypeVerifiers);
 
-            _structureService.VerifyType(type, TypeVerifiers);
+            // Potentially rewritting type
+            var translatedType = (CompileTimeTypeDescription)_structureService.TranslateType(originalType);
+            var newType = SyntaxFactory.ParseTypeName(translatedType.TypeSymbol.ToDisplayString());
 
-            var newType = GetTypeSyntax(_structureService.TranslateType(type));
+            // Potentially rewritting variable declators
             var newVariables = SyntaxFactory.SeparatedList(node.Variables.Select(Visit).OfType<VariableDeclaratorSyntax>());
+            
             return node.WithType(newType).WithVariables(newVariables);
         }
 
-        private TypeSyntax GetTypeSyntax(Type type)
-        {
-            return SyntaxFactory.ParseTypeName(type.Namespace + "." + type.Name);
-        }
-
-        private Type GetType(SyntaxNode node)
+        TypeDescription GetTypeDescription(SyntaxNode node)
         {
             var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
-            var typeInfo = semanticModel.GetTypeInfo(node);
-            var typeName = typeInfo.Type.Name;
+            var typeSymbol = semanticModel.GetTypeInfo(node).Type;
 
-            if (_cache.ContainsKey(typeName))
-                return _cache[typeName];
+            return new CompileTimeTypeDescription(typeSymbol);
+        }
 
-            var assemblyPath = _compilation.References.Skip(1).First().Display;
-            var assembly = GetAssembly(assemblyPath);
-
-            foreach (var type in assembly.GetModules().SelectMany(m => m.GetTypes()))
-                _cache[type.Name] = type;
-
-            return _cache.ContainsKey(typeName) ? _cache[typeName] : null;
-        } 
-
-        private Assembly GetAssembly(string assemblyPath)
+        ConstructorDescription GetConstructorDescription(ObjectCreationExpressionSyntax node)
         {
-            return Assembly.LoadFrom(assemblyPath);
+            var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
+            var methodSymbol = (IMethodSymbol)semanticModel.GetSymbolInfo(node).Symbol;
+
+            return new CompileTimeConstructorDescription(methodSymbol);
+        }
+        
+        MemberDescription GetFieldOrPropertyDescription(MemberAccessExpressionSyntax node)
+        {
+            
+            var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
+            var memberSymbol = semanticModel.GetSymbolInfo(node).Symbol;
+
+            if (memberSymbol is IFieldSymbol fieldSymbol)
+                return new CompileTimeFieldDescription(fieldSymbol);
+
+            if (memberSymbol is IPropertySymbol propertySymbol)
+                return new CompileTimePropertyDescription(propertySymbol);
+
+            if (memberSymbol is IMethodSymbol methodSymbol)
+                return new CompileTimeMethodDescription(methodSymbol);
+
+            throw new NotImplementedException();
+        }
+
+        MethodDescription GetMethodDescription(InvocationExpressionSyntax node)
+        {
+            var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
+            var methodSymbol = (IMethodSymbol)semanticModel.GetSymbolInfo(node).Symbol;
+
+            return new CompileTimeMethodDescription(methodSymbol);
         }
     }
 }

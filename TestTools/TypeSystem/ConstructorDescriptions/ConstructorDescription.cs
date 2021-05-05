@@ -9,7 +9,5 @@ namespace TestTools.TypeSystem
         // TODO add Attributes
 
         public override MemberTypes MemberType => MemberTypes.Constructor;
-
-        public abstract ParameterDescription[] GetParameters();
     }
 }

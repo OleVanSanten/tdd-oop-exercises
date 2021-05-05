@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using TestTools.Helpers;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure
 {
@@ -11,9 +12,9 @@ namespace TestTools.Structure
             TypeVerificationAspect.AccessLevel 
         };
 
-        public override void Verify(Type originalType, Type translatedType)
+        public override void Verify(TypeDescription originalType, TypeDescription translatedType)
         {
-            AccessLevels accessLevel = ReflectionHelper.GetAccessLevel(originalType);
+            AccessLevels accessLevel = DescriptionHelper.GetAccessLevel(originalType);
             Verifier.VerifyAccessLevel(translatedType, new[] { accessLevel });
         }
     }

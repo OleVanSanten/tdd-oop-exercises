@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure
 {
@@ -13,6 +14,6 @@ namespace TestTools.Structure
 
         public abstract MemberVerificationAspect[] Aspects { get; }
 
-        public abstract void Verify(MemberInfo originalMember, MemberInfo translatedMember);
+        public abstract void Verify(MemberDescription originalMember, MemberDescription translatedMember);
     }
 }

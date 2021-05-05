@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Text;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure
 {
@@ -19,10 +19,10 @@ namespace TestTools.Structure
             MemberVerificationAspect.FieldAccessLevel
         };
 
-        public override void Verify(MemberInfo originalMember, MemberInfo translatedMember)
+        public override void Verify(MemberDescription originalMember, MemberDescription translatedMember)
         {
             Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Field });
-            Verifier.VerifyIsInitOnly((FieldInfo)translatedMember, _isInitOnly);
+            Verifier.VerifyIsInitOnly((FieldDescription)translatedMember, _isInitOnly);
         }
     }
 }

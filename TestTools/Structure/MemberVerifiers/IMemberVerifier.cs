@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure
 {
@@ -13,6 +14,6 @@ namespace TestTools.Structure
 
         IStructureService Service { get; set; }
 
-        void Verify(MemberInfo originalMember, MemberInfo translatedMember);
+        void Verify(MemberDescription originalMember, MemberDescription translatedMember);
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using TestTools.Structure;
+using TestTools.TypeSystem;
 
 namespace TestTools.Helpers
 {
@@ -100,27 +101,27 @@ namespace TestTools.Helpers
             }
         }
 
-        public static string FormatMethod(MethodInfo methodInfo)
+        public static string FormatMethod(MethodDescription methodInfo)
         {
             return methodInfo.Name + "(" + FormatParameters(methodInfo.GetParameters()) + ")";
         }
 
-        public static string FormatSignature(Type type, string name, ParameterInfo[] parameterInfos)
+        public static string FormatSignature(TypeDescription type, string name, ParameterDescription[] parameterInfos)
         {
             return FormatType(type) + " " + name + "(" + FormatParameters(parameterInfos) + ")";
         }
 
-        public static string FormatConstructor(ConstructorInfo constructorInfo)
+        public static string FormatConstructor(ConstructorDescription constructorInfo)
         {
             return FormatType(constructorInfo.DeclaringType) + "(" + FormatParameters(constructorInfo.GetParameters()) + ")";
         }
 
-        private static string FormatParameters(ParameterInfo[] parameters)
+        private static string FormatParameters(ParameterDescription[] parameters)
         {
             StringBuilder builder = new StringBuilder();
 
             int i = 0; 
-            foreach(ParameterInfo parameter in parameters)
+            foreach(ParameterDescription parameter in parameters)
             {
                 if (i != 0)
                     builder.Append(", ");
@@ -136,12 +137,12 @@ namespace TestTools.Helpers
             return builder.ToString();
         }
 
-        public static string FormatMemberType(MemberTypes memberType)
+        public static string FormatMemberType(TypeSystem.MemberTypes memberType)
         {
             return memberType.ToString().ToLower();
         }
 
-        public static string FormatType(Type type)
+        public static string FormatType(TypeDescription type)
         {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
@@ -167,19 +168,19 @@ namespace TestTools.Helpers
                 [typeof(object)] = "object"
             };
 
-            if (BuiltinTypes.ContainsKey(type))
+            /*if (BuiltinTypes.ContainsKey(type))
             {
                 return BuiltinTypes[type];
-            }
-            else if (type.IsGenericType)
+            }*/
+            /*else if (type.IsGenericType)
             {
                 // This is based on https://stackoverflow.com/questions/1533115/get-generictype-name-in-good-format-using-reflection-on-c-sharp
                 string typeName = type.Name.Substring(0, type.Name.IndexOf('`'));
                 string[] typeArguments = type.GenericTypeArguments.Select(FormatType).ToArray();
 
                 return string.Format("{0}<{1}>", typeName, string.Join(", ", typeArguments));
-            }
-            else return type.Name;
+            }*/
+            return type.Name;
         }
     }
 }

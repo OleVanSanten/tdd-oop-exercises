@@ -14,14 +14,18 @@ namespace TestTools.TypeSystem
 
         public virtual NamespaceDescription GetNamespace(string name)
         {
-            return GetNamespaces().FirstOrDefault(n => n.Name == $"{Name}.{name}");
+            // Handling global namespace
+            if (string.IsNullOrEmpty(Name))
+                return GetNamespaces().First(n => n.Name == name);
+
+            return GetNamespaces().First(n => n.Name == $"{Name}.{name}");
         }
 
         public abstract NamespaceDescription[] GetNamespaces();
 
         public virtual TypeDescription GetType(string name)
         {
-            return GetTypes().FirstOrDefault(t => t.Name == name);
+            return GetTypes().First(t => t.Name == name);
         }
 
         public abstract TypeDescription[] GetTypes();

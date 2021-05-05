@@ -5,14 +5,15 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using TestTools.Helpers;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure
 {
     public class StructureService : IStructureService
     {
-        string FromNamespace { get; set; }
+        NamespaceDescription FromNamespace { get; set; }
 
-        string ToNamespace { get; set; }
+        NamespaceDescription ToNamespace { get; set; }
 
         public VerifierServiceBase StructureVerifier { get; set; }
 
@@ -54,25 +55,31 @@ namespace TestTools.Structure
             MemberVerificationAspect.MethodAccessLevel
         };
 
-        public StructureService(string fromNamespace, string toNamespace)
+        public StructureService(NamespaceDescription fromNamespace, NamespaceDescription toNamespace)
         {
+            if (fromNamespace == null)
+                throw new ArgumentNullException("fromNamespace cannot be null");
+            if (toNamespace == null)
+                throw new ArgumentNullException("toNamespace cannot be null");
+
             FromNamespace = fromNamespace;
             ToNamespace = toNamespace;
         }
 
-        public Type TranslateType(Type type)
+        public TypeDescription TranslateType(TypeDescription type)
         {
-            Type translatedType;
+            TypeDescription translatedType;
 
             if (type.IsArray)
             {
-                Type elementType = TranslateType(type.GetElementType());
-                return elementType.MakeArrayType();
+                throw new NotImplementedException();
+                //Type elementType = TranslateType(type.GetElementType());
+                //return elementType.MakeArrayType();
             }
 
-            if (type.Namespace == FromNamespace)
+            if (type.Namespace == FromNamespace.Name)
             {
-                ITypeTranslator translator = type.GetCustomTranslator() ?? TypeTranslator;
+                ITypeTranslator translator = /*type.GetCustomTranslator() ??*/ TypeTranslator;
                 translator.TargetNamespace = ToNamespace;
                 translator.Verifier = StructureVerifier;
 
@@ -80,21 +87,21 @@ namespace TestTools.Structure
             }
             else translatedType = type;
 
-            if (type.IsGenericType)
+            /*if (type.IsGenericType)
             {
                 // TODO add validation so that TypeArguments must match
                 Type[] typeArguments = type.GetGenericArguments().Select(TranslateType).ToArray();
                 return translatedType.GetGenericTypeDefinition().MakeGenericType(typeArguments);
-            }
+            }*/
             return translatedType;
         }
 
-        public MemberInfo TranslateMember(MemberInfo memberInfo)
+        public MemberDescription TranslateMember(MemberDescription memberInfo)
         {
-            if (memberInfo.DeclaringType.Namespace != FromNamespace)
+            if (memberInfo.DeclaringType.Namespace != FromNamespace.Name)
                 return memberInfo;
             
-            IMemberTranslator translator = memberInfo.GetCustomTranslator() ?? MemberTranslator;
+            IMemberTranslator translator = /*memberInfo.GetCustomTranslator() ??*/ MemberTranslator;
 
             translator.Verifier = StructureVerifier;
             translator.TargetType = TranslateType(memberInfo.DeclaringType);
@@ -102,12 +109,12 @@ namespace TestTools.Structure
             return translator.Translate(memberInfo);
         }
 
-        public MemberInfo TranslateMember(Type targetType, MemberInfo memberInfo)
+        public MemberDescription TranslateMember(TypeDescription targetType, MemberDescription memberInfo)
         {
-            if (memberInfo.DeclaringType.Namespace != FromNamespace)
+            if (memberInfo.DeclaringType.Namespace != FromNamespace.Name)
                 return memberInfo;
 
-            IMemberTranslator translator = memberInfo.GetCustomTranslator() ?? MemberTranslator;
+            IMemberTranslator translator = /*memberInfo.GetCustomTranslator() ??*/ MemberTranslator;
 
             translator.Verifier = StructureVerifier;
             translator.TargetType = targetType;
@@ -115,14 +122,14 @@ namespace TestTools.Structure
             return translator.Translate(memberInfo);
         }
 
-        public void VerifyType(Type original, ITypeVerifier[] verifiers)
+        public void VerifyType(TypeDescription original, ITypeVerifier[] verifiers)
         {
-            Type translated = TranslateType(original);
+            TypeDescription translated = TranslateType(original);
 
             foreach (TypeVerificationAspect aspect in TypeVerificationOrder)
             {
                 ITypeVerifier defaultVerifier = verifiers.FirstOrDefault(ver => ver.Aspects.Contains(aspect));
-                ITypeVerifier verifier = original.GetCustomVerifier(aspect) ?? defaultVerifier;
+                ITypeVerifier verifier = /*original.GetCustomVerifier(aspect) ??*/defaultVerifier;
 
                 if (verifier != null)
                 {
@@ -133,15 +140,15 @@ namespace TestTools.Structure
             }
         }
 
-        public void VerifyMember(MemberInfo original, IMemberVerifier[] verifiers)
+        public void VerifyMember(MemberDescription original, IMemberVerifier[] verifiers)
         {
-            Type translatedType = TranslateType(original.DeclaringType);
-            MemberInfo translatedMember = TranslateMember(translatedType, original);
+            TypeDescription translatedType = TranslateType(original.DeclaringType);
+            MemberDescription translatedMember = TranslateMember(translatedType, original);
 
             foreach (MemberVerificationAspect aspect in MemberVerificationOrder)
             {
                 IMemberVerifier defaultVerifier = verifiers.FirstOrDefault(ver => ver.Aspects.Contains(aspect));
-                IMemberVerifier verifier = original.GetCustomVerifier(aspect) ?? defaultVerifier;
+                IMemberVerifier verifier = /*original.GetCustomVerifier(aspect) ??*/ defaultVerifier;
 
                 if (verifier != null)
                 {

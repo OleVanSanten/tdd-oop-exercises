@@ -4,25 +4,27 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using TestTools.Helpers;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure
 {
     public class SameNameMemberTranslator : MemberTranslator
     {
-        public override MemberInfo Translate(MemberInfo member)
+        public override MemberDescription Translate(MemberDescription member)
         {
-            IEnumerable<MemberInfo> members = TargetType.GetAllMembers().Where(m => m.Name == member.Name);
+            IEnumerable<MemberDescription> allMembers = TargetType.GetMembers();
+            IEnumerable<MemberDescription> matchingMembers = allMembers.Where(m => m.Name == member.Name);
 
-            if (!members.Any())
+            if (!matchingMembers.Any())
                 Verifier.FailMemberNotFound(TargetType, new[] { member.Name });
 
             // Multiple MethodBase members may have the same name and only differ in argument list
-            if (member is MethodBase methodBase1)
+            if (member is MethodBaseDescription methodBase1)
             {
-                foreach (var methodBase2 in members.OfType<MethodBase>())
+                foreach (var methodBase2 in matchingMembers.OfType<MethodBaseDescription>())
                 {
                     // TODO Try to do this somewhat simpler 
-                    var methodBase3 = methodBase2;
+                    /*var methodBase3 = methodBase2;
 
                     if (methodBase2.IsGenericMethod)
                         methodBase3 = ((MethodInfo)methodBase2).MakeGenericMethod(methodBase1.GetGenericArguments());
@@ -31,16 +33,21 @@ namespace TestTools.Structure
                     var parameterTypes2 = methodBase3.GetParameters().Select(p => p.ParameterType);
 
                     if (parameterTypes1.SequenceEqual(parameterTypes2))
+                        return methodBase2;*/
+                    var parameterTypes1 = methodBase1.GetParameters().Select(p => p.ParameterType);
+                    var parameterTypes2 = methodBase2.GetParameters().Select(p => p.ParameterType);
+
+                    if (parameterTypes1.SequenceEqual(parameterTypes2))
                         return methodBase2;
                 }
 
                 // Fail if no matching method is found
-                if (methodBase1 is MethodInfo methodInfo)
+                if (methodBase1 is MethodDescription methodInfo)
                     Verifier.FailMethodNotFound(TargetType, methodInfo);
-                if (methodBase1 is ConstructorInfo constructorInfo)
+                if (methodBase1 is ConstructorDescription constructorInfo)
                     Verifier.FailConstructorNotFound(TargetType, constructorInfo);
             }
-            return members.First();
+            return matchingMembers.First();
         }
     }
 }

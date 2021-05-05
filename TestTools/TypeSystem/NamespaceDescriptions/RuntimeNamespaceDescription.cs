@@ -39,10 +39,20 @@ namespace TestTools.TypeSystem
         {
             var output = new List<TypeDescription>();
 
-            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+            // The try-catch block is a little hack for accessing as many assemblies as possible,
+            // because some assemblies always fail to load, like Microsoft.CodeAnalysis assemblies.
+            // This might be a result of an unresolved configuration issues in one of the projects.
+            var assemblyEnumerator = AppDomain.CurrentDomain.GetAssemblies().Reverse().GetEnumerator();
+            while (assemblyEnumerator.MoveNext())
             {
-                var typeDescriptions = assembly.GetTypes().Select(t => new RuntimeTypeDescription(t));
-                output.AddRange(typeDescriptions);
+                try
+                {
+                    var assembly = assemblyEnumerator.Current;
+                    var typesInNamespace = assembly.GetTypes().Where(t => t.Namespace == Name);
+                    var typeDescriptions = typesInNamespace.Select(t => new RuntimeTypeDescription(t));
+                    output.AddRange(typeDescriptions);
+                }
+                catch (ReflectionTypeLoadException) { }
             }
             return output.ToArray();
         }

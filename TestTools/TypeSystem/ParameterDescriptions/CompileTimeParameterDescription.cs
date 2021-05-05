@@ -7,23 +7,23 @@ namespace TestTools.TypeSystem
 {
     public class CompileTimeParameterDescription : ParameterDescription
     {
-        IParameterSymbol _parameterSymbol;
-
         public CompileTimeParameterDescription(IParameterSymbol parameterSymbol)
         {
-            _parameterSymbol = parameterSymbol;
+            ParameterSymbol = parameterSymbol;
         }
 
-        public override object DefaultValue => _parameterSymbol.ExplicitDefaultValue;
+        public IParameterSymbol ParameterSymbol;
 
-        public override bool HasDefaultValue => _parameterSymbol.HasExplicitDefaultValue;
+        public override object DefaultValue => ParameterSymbol.ExplicitDefaultValue;
 
-        public override bool IsIn => _parameterSymbol.RefKind == RefKind.In;
+        public override bool HasDefaultValue => ParameterSymbol.HasExplicitDefaultValue;
 
-        public override bool IsOut => _parameterSymbol.RefKind == RefKind.Out;
+        public override bool IsIn => ParameterSymbol.RefKind == RefKind.In;
 
-        public override string Name => _parameterSymbol.Name;
+        public override bool IsOut => ParameterSymbol.RefKind == RefKind.Out;
 
-        public override TypeDescription ParameterType => new CompileTimeTypeDescription(_parameterSymbol.Type);
+        public override string Name => ParameterSymbol.Name;
+
+        public override TypeDescription ParameterType => new CompileTimeTypeDescription(ParameterSymbol.Type);
     }
 }

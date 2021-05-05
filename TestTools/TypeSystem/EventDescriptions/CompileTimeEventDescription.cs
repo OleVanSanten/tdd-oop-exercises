@@ -7,21 +7,21 @@ namespace TestTools.TypeSystem
 {
     public class CompileTimeEventDescription : EventDescription
     {
-        IEventSymbol _eventSymbol;
-
         public CompileTimeEventDescription(IEventSymbol eventSymbol)
         {
-            _eventSymbol = eventSymbol;
+            EventSymbol = eventSymbol;
         }
 
-        public override MethodDescription AddMethod => new CompileTimeMethodDescription(_eventSymbol.AddMethod);
+        public IEventSymbol EventSymbol { get; }
 
-        public override TypeDescription DeclaringType => new CompileTimeTypeDescription(_eventSymbol.ContainingType);
+        public override MethodDescription AddMethod => new CompileTimeMethodDescription(EventSymbol.AddMethod);
 
-        public override TypeDescription EventHandlerType => new CompileTimeTypeDescription(_eventSymbol.Type);
+        public override TypeDescription DeclaringType => new CompileTimeTypeDescription(EventSymbol.ContainingType);
 
-        public override string Name => _eventSymbol.Name;
+        public override TypeDescription EventHandlerType => new CompileTimeTypeDescription(EventSymbol.Type);
 
-        public override MethodDescription RemoveMethod => new CompileTimeMethodDescription(_eventSymbol.RemoveMethod);
+        public override string Name => EventSymbol.Name;
+
+        public override MethodDescription RemoveMethod => new CompileTimeMethodDescription(EventSymbol.RemoveMethod);
     }
 }

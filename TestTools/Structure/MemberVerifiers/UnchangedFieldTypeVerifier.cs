@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Text;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure
 {
@@ -9,15 +9,15 @@ namespace TestTools.Structure
     {
         public override MemberVerificationAspect[] Aspects => new[] { MemberVerificationAspect.FieldType };
 
-        public override void Verify(MemberInfo originalMember, MemberInfo translatedMember)
+        public override void Verify(MemberDescription originalMember, MemberDescription translatedMember)
         {
-            FieldInfo translatedField = translatedMember as FieldInfo;
+            FieldDescription translatedField = translatedMember as FieldDescription;
 
             Verifier.VerifyMemberType(translatedMember, new MemberTypes[] { MemberTypes.Field, MemberTypes.Property });
 
-            if (originalMember is FieldInfo originalField)
+            if (originalMember is FieldDescription originalField)
                 Verifier.VerifyFieldType(translatedField, originalField.FieldType);
-            else if (originalMember is PropertyInfo originalProperty)
+            else if (originalMember is PropertyDescription originalProperty)
                 Verifier.VerifyFieldType(translatedField, originalProperty.PropertyType);
             else throw new NotImplementedException();
         }

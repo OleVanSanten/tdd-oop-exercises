@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Linq;
 using TestTools.Helpers;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure
 {
@@ -39,22 +40,28 @@ namespace TestTools.Structure
 
         protected override Expression VisitNew(NewExpression node)
         {
-            _structureService.VerifyType(node.Type, TypeVerifiers);
+            var originalType = new RuntimeTypeDescription(node.Type);
+            var originalConstructor = new RuntimeConstructorDescription(node.Constructor);
+
+            _structureService.VerifyType(originalType, TypeVerifiers);
             _structureService.VerifyMember(
-                node.Constructor,
+                originalConstructor,
                 MemberVerifiers,
                 MemberVerificationAspect.MemberType,
                 MemberVerificationAspect.ConstructorAccessLevel);
 
-            MemberInfo memberInfo = _structureService.TranslateMember(node.Constructor);
-            return Expression.New((ConstructorInfo)memberInfo, node.Arguments.Select(Visit));
+            var translatedConstructor = (RuntimeConstructorDescription)_structureService.TranslateMember(originalConstructor);
+            return Expression.New(translatedConstructor.ConstructorInfo, node.Arguments.Select(Visit));
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            _structureService.VerifyType(node.Type, TypeVerifiers);
+            var originalType = new RuntimeTypeDescription(node.Type);
+            var originalMethod = new RuntimeMethodDescription(node.Method);
+
+            _structureService.VerifyType(originalType, TypeVerifiers);
             _structureService.VerifyMember(
-                node.Method,
+                originalMethod,
                 MemberVerifiers,
                 MemberVerificationAspect.MemberType,
                 MemberVerificationAspect.MethodDeclaringType,
@@ -64,7 +71,8 @@ namespace TestTools.Structure
                 MemberVerificationAspect.MethodIsVirtual,
                 MemberVerificationAspect.MethodAccessLevel);
 
-            MethodInfo methodInfo = (MethodInfo)_structureService.TranslateMember(node.Method);
+            var translatedMethod = (RuntimeMethodDescription)_structureService.TranslateMember(originalMethod);
+            MethodInfo methodInfo = translatedMethod.MethodInfo;
             ParameterInfo[] methodPars = methodInfo.GetParameters();
             Expression[] methodArgs = node.Arguments.Select(Visit).ToArray();
             
@@ -94,25 +102,31 @@ namespace TestTools.Structure
 
         protected override Expression VisitMember(MemberExpression node)
         {
-            _structureService.VerifyType(node.Type, TypeVerifiers);
-            _structureService.VerifyMember(node.Member, MemberVerifiers, MemberVerificationAspect.MemberType);
+            var originalType = new RuntimeTypeDescription(node.Type);
+            var factory = new RuntimeDescriptionFactory();
+            var originalMember = factory.Create(node.Member);
 
-            MemberInfo memberInfo = _structureService.TranslateMember(node.Member);
-            
-            if (memberInfo is FieldInfo fieldInfo)
+            _structureService.VerifyType(originalType, TypeVerifiers);
+            _structureService.VerifyMember(originalMember, MemberVerifiers, MemberVerificationAspect.MemberType);
+
+            var translatedMember = _structureService.TranslateMember(originalMember);
+
+            if (translatedMember is FieldDescription fieldDescription)
             {
                 _structureService.VerifyMember(
-                    node.Member,
+                    fieldDescription,
                     MemberVerifiers,
                     MemberVerificationAspect.FieldType,
                     MemberVerificationAspect.FieldIsStatic,
                     MemberVerificationAspect.FieldAccessLevel);
+
+                var fieldInfo = ((RuntimeFieldDescription)fieldDescription).FieldInfo;
                 return Expression.Field(Visit(node.Expression), fieldInfo);
             }
-            else if (memberInfo is PropertyInfo propertyInfo)
+            else if (translatedMember is PropertyDescription propertyDescription)
             {
                 _structureService.VerifyMember(
-                       node.Member,
+                       propertyDescription,
                        MemberVerifiers,
                        MemberVerificationAspect.PropertyType,
                        MemberVerificationAspect.PropertyIsStatic,
@@ -120,6 +134,7 @@ namespace TestTools.Structure
                        MemberVerificationAspect.PropertyGetIsAbstract,
                        MemberVerificationAspect.PropertyGetIsVirtual,
                        MemberVerificationAspect.PropertyGetAccessLevel);
+                var propertyInfo = ((RuntimePropertyDescription)propertyDescription).PropertyInfo;
                 return Expression.Property(Visit(node.Expression), propertyInfo);
             }
             else throw new ArgumentException("Member was not translated to FieldInfo or PropertyInfo");
@@ -127,25 +142,32 @@ namespace TestTools.Structure
 
         protected override MemberAssignment VisitMemberAssignment(MemberAssignment node)
         {
-            _structureService.VerifyType(node.Member.DeclaringType, TypeVerifiers);
-            _structureService.VerifyMember(node.Member, MemberVerifiers, MemberVerificationAspect.MemberType);
+            var originalType = new RuntimeTypeDescription(node.Member.DeclaringType);
+            var factory = new RuntimeDescriptionFactory();
+            var originalMember = factory.Create(node.Member);
 
-            MemberInfo memberInfo = _structureService.TranslateMember(node.Member);
-            if (memberInfo is FieldInfo fieldInfo)
+            _structureService.VerifyType(originalType, TypeVerifiers);
+            _structureService.VerifyMember(originalMember, MemberVerifiers, MemberVerificationAspect.MemberType);
+
+            var translatedMember = _structureService.TranslateMember(originalMember);
+
+            if (translatedMember is FieldDescription fieldDescription)
             {
                 _structureService.VerifyMember(
-                    node.Member,
+                    translatedMember,
                     MemberVerifiers,
                     MemberVerificationAspect.FieldType,
                     MemberVerificationAspect.FieldIsStatic,
                     MemberVerificationAspect.FieldWriteability,
                     MemberVerificationAspect.FieldAccessLevel);
+
+                var fieldInfo = ((RuntimeFieldDescription)fieldDescription).FieldInfo;
                 return Expression.Bind(fieldInfo, node.Expression);
             }
-            else if (memberInfo is PropertyInfo propertyInfo)
+            else if (translatedMember is PropertyDescription propertyDescription)
             {
                 _structureService.VerifyMember(
-                       node.Member,
+                       translatedMember,
                        MemberVerifiers,
                        MemberVerificationAspect.PropertyType,
                        MemberVerificationAspect.PropertyIsStatic,
@@ -153,6 +175,8 @@ namespace TestTools.Structure
                        MemberVerificationAspect.PropertySetIsAbstract,
                        MemberVerificationAspect.PropertySetIsVirtual,
                        MemberVerificationAspect.PropertySetAccessLevel);
+
+                var propertyInfo = ((RuntimePropertyDescription)propertyDescription).PropertyInfo;
                 return Expression.Bind(propertyInfo, node.Expression);
             }
             else throw new ArgumentException("Member was not translated to FieldInfo or PropertyInfo");
@@ -160,7 +184,9 @@ namespace TestTools.Structure
 
         protected override Expression VisitParameter(ParameterExpression node)
         {
-            _structureService.VerifyType(node.Type, TypeVerifiers);
+            var originalType = new RuntimeTypeDescription(node.Type);
+
+            _structureService.VerifyType(originalType, TypeVerifiers);
 
             // To preserve the referential equality of parameter expressions 
             // the function must return the exact same output for the same input.
@@ -168,8 +194,8 @@ namespace TestTools.Structure
             if (!_variableCache.ContainsKey(node))
             {
                 Random random = new Random();
-                Type translatedType = _structureService.TranslateType(node.Type);
-                ParameterExpression newParameter = Expression.Parameter(translatedType, random.Next().ToString());
+                var translatedType = (RuntimeTypeDescription)_structureService.TranslateType(originalType);
+                ParameterExpression newParameter = Expression.Parameter(translatedType.Type, random.Next().ToString());
 
                 _variableCache.Add(node, newParameter);
 

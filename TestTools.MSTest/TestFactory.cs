@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using TestTools.Structure;
+using TestTools.TypeSystem;
 
 namespace TestTools.MSTest
 {
@@ -10,6 +11,11 @@ namespace TestTools.MSTest
         public IStructureService StructureService { get; set; }
 
         public TestFactory(string fromNamespace, string toNamespace)
+            : this(new RuntimeNamespaceDescription(fromNamespace), new RuntimeNamespaceDescription(toNamespace))
+        {
+        }
+
+        public TestFactory(NamespaceDescription fromNamespace, NamespaceDescription toNamespace)
         {
             StructureService = new StructureService(fromNamespace, toNamespace)
             {

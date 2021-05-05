@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Text;
 using TestTools.Helpers;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure
 {
@@ -13,17 +13,17 @@ namespace TestTools.Structure
             MemberVerificationAspect.FieldAccessLevel
         };
 
-        public override void Verify(MemberInfo originalMember, MemberInfo translatedMember)
+        public override void Verify(MemberDescription originalMember, MemberDescription translatedMember)
         {
             Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Field, MemberTypes.Property });
             
-            if (translatedMember is FieldInfo fieldInfo)
+            if (translatedMember is FieldDescription fieldInfo)
             {
                 Verifier.VerifyIsInitOnly(fieldInfo, true);
             }
-            else if(translatedMember is PropertyInfo propertyInfo)
+            else if(translatedMember is PropertyDescription propertyInfo)
             {
-                Verifier.VerifyIsReadonly(propertyInfo, ReflectionHelper.GetAccessLevel(propertyInfo));
+                Verifier.VerifyIsReadonly(propertyInfo, DescriptionHelper.GetAccessLevel(propertyInfo));
             } 
         }
     }

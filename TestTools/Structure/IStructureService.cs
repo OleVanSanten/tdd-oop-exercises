@@ -2,17 +2,18 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure
 {
     public interface IStructureService
     {
-        Type TranslateType(Type type);
+        TypeDescription TranslateType(TypeDescription type);
 
-        MemberInfo TranslateMember(MemberInfo memberInfo);
+        MemberDescription TranslateMember(MemberDescription memberInfo);
 
-        void VerifyType(Type original, ITypeVerifier[] verifiers);
+        void VerifyType(TypeDescription original, ITypeVerifier[] verifiers);
 
-        void VerifyMember(MemberInfo original, IMemberVerifier[] verifiers);
+        void VerifyMember(MemberDescription original, IMemberVerifier[] verifiers);
     }
 }

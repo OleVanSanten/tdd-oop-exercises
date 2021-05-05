@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure
 {
@@ -18,9 +19,9 @@ namespace TestTools.Structure
             TypeVerificationAspect.IsSubclassOf
         };
 
-        public override void Verify(Type originalType, Type translatedType)
+        public override void Verify(TypeDescription originalType, TypeDescription translatedType)
         {
-            Verifier.VerifyBaseType(translatedType, _type);
+            Verifier.VerifyBaseType(translatedType, new RuntimeTypeDescription(_type));
         }
     }
 }

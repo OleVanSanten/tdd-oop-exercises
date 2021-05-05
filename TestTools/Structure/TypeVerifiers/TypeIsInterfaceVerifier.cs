@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure
 {
@@ -11,8 +12,7 @@ namespace TestTools.Structure
             TypeVerificationAspect.IsInterface 
         };
 
-
-        public override void Verify(Type originalType, Type translatedType)
+        public override void Verify(TypeDescription originalType, TypeDescription translatedType)
         {
             Verifier.VerifyIsInterface(translatedType);
         }

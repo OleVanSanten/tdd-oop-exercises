@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure
 {
@@ -19,10 +20,10 @@ namespace TestTools.Structure
             TypeVerificationAspect.DelegateSignature
         };
 
-        public override void Verify(Type originalType, Type translatedType)
+        public override void Verify(TypeDescription originalType, TypeDescription translatedType)
         {
             Verifier.VerifyIsDelegate(translatedType);
-            Verifier.VerifyDelegateSignature(translatedType, _delegateType.GetMethod("Invoke"));
+            Verifier.VerifyDelegateSignature(translatedType, new RuntimeMethodDescription(_delegateType.GetMethod("Invoke")));
         }
     }
 }

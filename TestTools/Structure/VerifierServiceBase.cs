@@ -4,6 +4,7 @@ using System.Text;
 using System.Linq;
 using System.Reflection;
 using TestTools.Helpers;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure
 {
@@ -14,9 +15,9 @@ namespace TestTools.Structure
         // are framework-dependent
         public abstract void Fail(string message);
 
-        public virtual void VerifyAccessLevel(Type type, AccessLevels[] accessLevels)
+        public virtual void VerifyAccessLevel(TypeDescription type, AccessLevels[] accessLevels)
         {
-            if (accessLevels.Contains(ReflectionHelper.GetAccessLevel(type)))
+            if (accessLevels.Contains(DescriptionHelper.GetAccessLevel(type)))
                 return;
 
             string message = string.Format(
@@ -27,7 +28,7 @@ namespace TestTools.Structure
             Fail(message);
         }
 
-        public virtual void FailMemberNotFound(Type targetType, string[] vs)
+        public virtual void FailMemberNotFound(TypeDescription targetType, string[] vs)
         {
             if (vs.Length == 1)
             {
@@ -40,7 +41,7 @@ namespace TestTools.Structure
             else throw new NotImplementedException();
         }
 
-        public virtual void FailMethodNotFound(Type targetType, MethodInfo methodInfo)
+        public virtual void FailMethodNotFound(TypeDescription targetType, MethodDescription methodInfo)
         {
             string message = string.Format(
                 "{0} does not contain member {1}",
@@ -49,7 +50,7 @@ namespace TestTools.Structure
             Fail(message);
         }
 
-        public virtual void FailConstructorNotFound(Type targetType, ConstructorInfo constructorInfo)
+        public virtual void FailConstructorNotFound(TypeDescription targetType, ConstructorDescription constructorInfo)
         {
             string message = string.Format(
                 "{0} does not contain member {1}",
@@ -58,25 +59,25 @@ namespace TestTools.Structure
             Fail(message);
         }
 
-        public virtual void FailTypeNotFound(string @namespace, string[] name)
+        public virtual void FailTypeNotFound(NamespaceDescription @namespace, string[] name)
         {
             if (name.Length == 1)
-                Fail($"Namespace {@namespace} does not contain type {name[0]}");
+                Fail($"Namespace {@namespace.Name} does not contain type {name[0]}");
             else throw new NotImplementedException();
         }
 
-        public virtual void FailTypeNotFound(string @namespace, Type type)
+        public virtual void FailTypeNotFound(NamespaceDescription @namespace, TypeDescription type)
         {
             string message = string.Format(
                 "Namespace {0} does not contain the type {1}",
-                @namespace,
+                @namespace.Name,
                 FormatHelper.FormatType(type));
             Fail(message);
         }
 
-        public virtual void VerifyAccessLevel(ConstructorInfo constructorInfo, AccessLevels[] accessLevels)
+        public virtual void VerifyAccessLevel(ConstructorDescription constructorInfo, AccessLevels[] accessLevels)
         {
-            if (accessLevels.Contains(ReflectionHelper.GetAccessLevel(constructorInfo)))
+            if (accessLevels.Contains(DescriptionHelper.GetAccessLevel(constructorInfo)))
                 return;
 
             string message = string.Format(
@@ -87,11 +88,11 @@ namespace TestTools.Structure
             Fail(message);
         }
 
-        public virtual void VerifyAccessLevel(EventInfo eventInfo, AccessLevels[] accessLevels, bool AddMethod = false, bool RemoveMethod = false)
+        public virtual void VerifyAccessLevel(EventDescription eventInfo, AccessLevels[] accessLevels, bool AddMethod = false, bool RemoveMethod = false)
         {
             string message;
 
-            if (AddMethod && !accessLevels.Contains(ReflectionHelper.GetAccessLevel(eventInfo.AddMethod)))
+            if (AddMethod && !accessLevels.Contains(DescriptionHelper.GetAccessLevel(eventInfo.AddMethod)))
             {
                 message = string.Format(
                     "{0}.{1} add accessor is not {2}",
@@ -101,7 +102,7 @@ namespace TestTools.Structure
 
                 Fail(message);
             }
-            else if (RemoveMethod && !accessLevels.Contains(ReflectionHelper.GetAccessLevel(eventInfo.RemoveMethod)))
+            else if (RemoveMethod && !accessLevels.Contains(DescriptionHelper.GetAccessLevel(eventInfo.RemoveMethod)))
             {
                 message = string.Format(
                     "{0}.{1} set accessor is not {2}",
@@ -113,9 +114,9 @@ namespace TestTools.Structure
             }
         }
 
-        public virtual void VerifyAccessLevel(FieldInfo fieldInfo, AccessLevels[] accessLevels)
+        public virtual void VerifyAccessLevel(FieldDescription fieldInfo, AccessLevels[] accessLevels)
         {
-            if (accessLevels.Contains(ReflectionHelper.GetAccessLevel(fieldInfo)))
+            if (accessLevels.Contains(DescriptionHelper.GetAccessLevel(fieldInfo)))
                 return;
 
             string message = string.Format(
@@ -127,11 +128,11 @@ namespace TestTools.Structure
             Fail(message);
         }
 
-        public virtual void VerifyAccessLevel(PropertyInfo propertyInfo, AccessLevels[] accessLevels, bool GetMethod = false, bool SetMethod = false)
+        public virtual void VerifyAccessLevel(PropertyDescription propertyInfo, AccessLevels[] accessLevels, bool GetMethod = false, bool SetMethod = false)
         {
             string message;
 
-            if (GetMethod && !accessLevels.Contains(ReflectionHelper.GetAccessLevel(propertyInfo.GetMethod)))
+            if (GetMethod && !accessLevels.Contains(DescriptionHelper.GetAccessLevel(propertyInfo.GetMethod)))
             {
                 message = string.Format(
                     "{0}.{1} get accessor is not {2}",
@@ -141,7 +142,7 @@ namespace TestTools.Structure
 
                 Fail(message);
             }
-            else if (SetMethod && !accessLevels.Contains(ReflectionHelper.GetAccessLevel(propertyInfo.SetMethod)))
+            else if (SetMethod && !accessLevels.Contains(DescriptionHelper.GetAccessLevel(propertyInfo.SetMethod)))
             {
                 message = string.Format(
                     "{0}.{1} set accessor is not {2}",
@@ -153,9 +154,9 @@ namespace TestTools.Structure
             }
         }
 
-        public virtual void VerifyAccessLevel(MethodInfo methodInfo, AccessLevels[] accessLevels)
+        public virtual void VerifyAccessLevel(MethodDescription methodInfo, AccessLevels[] accessLevels)
         {
-            if (accessLevels.Contains(ReflectionHelper.GetAccessLevel(methodInfo)))
+            if (accessLevels.Contains(DescriptionHelper.GetAccessLevel(methodInfo)))
                 return;
 
             string message = string.Format(
@@ -167,7 +168,7 @@ namespace TestTools.Structure
             Fail(message);
         }
 
-        public virtual void VerifyBaseType(Type type, Type baseType)
+        public virtual void VerifyBaseType(TypeDescription type, TypeDescription baseType)
         {
             if (type.BaseType == baseType)
                 return;
@@ -180,7 +181,7 @@ namespace TestTools.Structure
             Fail(message);
         }
 
-        public virtual void VerifyDeclaringType(FieldInfo fieldInfo, Type declaringType)
+        public virtual void VerifyDeclaringType(FieldDescription fieldInfo, TypeDescription declaringType)
         {
             if (fieldInfo.DeclaringType == declaringType)
                 return;
@@ -193,7 +194,7 @@ namespace TestTools.Structure
             Fail(message);
         }
 
-        public virtual void VerifyDeclaringType(MethodInfo methodInfo, Type declaringType)
+        public virtual void VerifyDeclaringType(MethodDescription methodInfo, TypeDescription declaringType)
         {
             if (methodInfo.DeclaringType == declaringType)
                 return;
@@ -206,7 +207,7 @@ namespace TestTools.Structure
             Fail(message);
         }
 
-        public virtual void VerifyDeclaringType(PropertyInfo propertyInfo, Type declaringType, bool GetMethod = false, bool SetMethod = false)
+        public virtual void VerifyDeclaringType(PropertyDescription propertyInfo, TypeDescription declaringType, bool GetMethod = false, bool SetMethod = false)
         {
             string message;
 
@@ -230,10 +231,10 @@ namespace TestTools.Structure
             }
         }
 
-        public virtual void VerifyDelegateSignature(Type delegateType, MethodInfo methodInfo)
+        public virtual void VerifyDelegateSignature(TypeDescription delegateType, MethodDescription methodInfo)
         {
-            if (delegateType.IsDelegateOf(methodInfo))
-                return;
+            //if (delegateType.IsDelegateOf(methodInfo))
+                //return;
 
             string message = string.Format(
                 "{0} does not match signature {1}",
@@ -243,7 +244,7 @@ namespace TestTools.Structure
             Fail(message);
         }
 
-        public virtual void VerifyEventHandlerType(EventInfo eventInfo, Type type)
+        public virtual void VerifyEventHandlerType(EventDescription eventInfo, TypeDescription type)
         {
             if (eventInfo.EventHandlerType == type)
                 return;
@@ -257,7 +258,7 @@ namespace TestTools.Structure
             Fail(message);
         }
 
-        public virtual void VerifyFieldType(FieldInfo fieldInfo, Type type)
+        public virtual void VerifyFieldType(FieldDescription fieldInfo, TypeDescription type)
         {
             if (fieldInfo.FieldType == type)
                 return;
@@ -271,7 +272,7 @@ namespace TestTools.Structure
             Fail(message);
         }
 
-        public virtual void VerifyIsAbstract(Type type, bool isAbstract)
+        public virtual void VerifyIsAbstract(TypeDescription type, bool isAbstract)
         {
             if (type.IsAbstract == isAbstract)
                 return;
@@ -284,7 +285,7 @@ namespace TestTools.Structure
             Fail(message);
         }
 
-        public virtual void VerifyIsAbstract(MethodInfo methodInfo, bool isAbstract)
+        public virtual void VerifyIsAbstract(MethodDescription methodInfo, bool isAbstract)
         {
             if (methodInfo.IsAbstract == isAbstract)
                 return;
@@ -298,7 +299,7 @@ namespace TestTools.Structure
             Fail(message);
         }
 
-        public virtual void VerifyIsAbstract(PropertyInfo propertyInfo, bool isAbstract, bool GetMethod = false, bool SetMethod = false)
+        public virtual void VerifyIsAbstract(PropertyDescription propertyInfo, bool isAbstract, bool GetMethod = false, bool SetMethod = false)
         {
             string template, message;
 
@@ -324,10 +325,10 @@ namespace TestTools.Structure
             }
         }
 
-        public virtual void VerifyIsDelegate(Type type)
+        public virtual void VerifyIsDelegate(TypeDescription type)
         {
-            if (type.IsSubclassOf(typeof(Delegate)))
-                return;
+            //if (type.IsSubclassOf(typeof(Delegate)))
+            //    return;
 
             string message = string.Format(
                 "{0} is not a delegate type",
@@ -336,7 +337,7 @@ namespace TestTools.Structure
             Fail(message);
         }
 
-        public virtual void VerifyIsHideBySig(MethodInfo methodInfo, bool isHideBySig)
+        public virtual void VerifyIsHideBySig(MethodDescription methodInfo, bool isHideBySig)
         {
             if (methodInfo.IsVirtual == isHideBySig)
                 return;
@@ -350,7 +351,7 @@ namespace TestTools.Structure
             Fail(message);
         }
 
-        public virtual void VerifyIsHideBySig(PropertyInfo propertyInfo, bool isHideBySig, bool GetMethod = false, bool SetMethod = false)
+        public virtual void VerifyIsHideBySig(PropertyDescription propertyInfo, bool isHideBySig, bool GetMethod = false, bool SetMethod = false)
         {
             string template, message;
 
@@ -376,7 +377,7 @@ namespace TestTools.Structure
             }
         }
 
-        public virtual void VerifyIsInitOnly(FieldInfo fieldInfo, bool isInitOnly)
+        public virtual void VerifyIsInitOnly(FieldDescription fieldInfo, bool isInitOnly)
         {
             if (fieldInfo.IsInitOnly == isInitOnly)
                 return;
@@ -390,7 +391,7 @@ namespace TestTools.Structure
             Fail(message);
         }
 
-        public virtual void VerifyIsInterface(Type type)
+        public virtual void VerifyIsInterface(TypeDescription type)
         {
             if (type.IsInterface)
                 return;
@@ -402,9 +403,9 @@ namespace TestTools.Structure
             Fail(message);
         }
 
-        public virtual void VerifyIsStatic(Type type, bool isStatic)
+        public virtual void VerifyIsStatic(TypeDescription type, bool isStatic)
         {
-            if (type.IsStatic() == isStatic)
+            if ((type.IsAbstract && type.IsSealed) == isStatic)
                 return;
 
             string template = isStatic ? "{0} must be static" : "{0} cannot be static";
@@ -415,7 +416,7 @@ namespace TestTools.Structure
             Fail(message);
         }
 
-        public virtual void VerifyIsStatic(FieldInfo fieldInfo, bool isStatic)
+        public virtual void VerifyIsStatic(FieldDescription fieldInfo, bool isStatic)
         {
             if (fieldInfo.IsStatic == isStatic)
                 return;
@@ -429,7 +430,7 @@ namespace TestTools.Structure
             Fail(message);
         }
 
-        public virtual void VerifyIsStatic(MethodInfo methodInfo, bool isStatic)
+        public virtual void VerifyIsStatic(MethodDescription methodInfo, bool isStatic)
         {
             if (methodInfo.IsStatic == isStatic)
                 return;
@@ -443,7 +444,7 @@ namespace TestTools.Structure
             Fail(message);
         }
 
-        public virtual void VerifyIsStatic(PropertyInfo propertyInfo, bool isStatic)
+        public virtual void VerifyIsStatic(PropertyDescription propertyInfo, bool isStatic)
         {
             if ((propertyInfo.GetMethod ?? propertyInfo.SetMethod).IsStatic == isStatic)
                 return;
@@ -457,12 +458,12 @@ namespace TestTools.Structure
             Fail(message);
         }
 
-        public virtual void VerifyIsSubclassOf(Type type, Type baseType)
+        public virtual void VerifyIsSubclassOf(TypeDescription type, TypeDescription baseType)
         {
             if (baseType.IsClass)
             {
-                if (type.IsSubclassOf(baseType))
-                    return;
+                //if (type.IsSubclassOf(baseType))
+                //    return;
 
                 string message = string.Format(
                         "{0} is not a subclass of {1}",
@@ -473,8 +474,8 @@ namespace TestTools.Structure
             }
             else if (baseType.IsInterface)
             {
-                if (type.IsImplementationOf(baseType))
-                    return;
+                //if (type.IsImplementationOf(baseType))
+                //    return;
 
                 string message = string.Format(
                         "{0} is not an implementation of {1}",
@@ -486,7 +487,7 @@ namespace TestTools.Structure
             else throw new NotImplementedException();
         }
 
-        public virtual void VerifyIsVirtual(MethodInfo methodInfo, bool isVirtual)
+        public virtual void VerifyIsVirtual(MethodDescription methodInfo, bool isVirtual)
         {
             if (methodInfo.IsVirtual == isVirtual)
                 return;
@@ -500,7 +501,7 @@ namespace TestTools.Structure
             Fail(message);
         }
 
-        public virtual void VerifyIsVirtual(PropertyInfo propertyInfo, bool isVirtual, bool GetMethod = false, bool SetMethod = false)
+        public virtual void VerifyIsVirtual(PropertyDescription propertyInfo, bool isVirtual, bool GetMethod = false, bool SetMethod = false)
         {
             string template, message;
 
@@ -526,7 +527,7 @@ namespace TestTools.Structure
             }
         }
 
-        public virtual void VerifyMemberType(MemberInfo memberInfo, MemberTypes[] memberTypes)
+        public virtual void VerifyMemberType(MemberDescription memberInfo, TypeSystem.MemberTypes[] memberTypes)
         {
             if (memberTypes.Contains(memberInfo.MemberType))
                 return;
@@ -541,7 +542,7 @@ namespace TestTools.Structure
             Fail(message);
         }
 
-        public virtual void VerifyPropertyType(PropertyInfo propertyInfo, Type type)
+        public virtual void VerifyPropertyType(PropertyDescription propertyInfo, TypeDescription type)
         {
             if (propertyInfo.PropertyType == type)
                 return;
@@ -555,7 +556,7 @@ namespace TestTools.Structure
             Fail(message);
         }
 
-        public virtual void VerifyCanRead(PropertyInfo propertyInfo, bool canRead)
+        public virtual void VerifyCanRead(PropertyDescription propertyInfo, bool canRead)
         {
             if (propertyInfo.CanRead == canRead)
                 return;
@@ -569,7 +570,7 @@ namespace TestTools.Structure
             Fail(message);
         }
 
-        public virtual void VerifyIsReadonly(PropertyInfo propertyInfo, AccessLevels accessLevel)
+        public virtual void VerifyIsReadonly(PropertyDescription propertyInfo, AccessLevels accessLevel)
         {
             VerifyCanRead(propertyInfo, canRead: true);
             VerifyAccessLevel(propertyInfo, new[] { accessLevel }, GetMethod: true);
@@ -577,7 +578,7 @@ namespace TestTools.Structure
             if (!propertyInfo.CanWrite)
                 return;
 
-            AccessLevels setMethodAccessLevel = ReflectionHelper.GetAccessLevel(propertyInfo.SetMethod);
+            AccessLevels setMethodAccessLevel = DescriptionHelper.GetAccessLevel(propertyInfo.SetMethod);
 
             if (accessLevel == AccessLevels.Protected)
             {
@@ -605,7 +606,7 @@ namespace TestTools.Structure
             else throw new NotImplementedException();
         }
 
-        public virtual void VerifyIsWriteonly(PropertyInfo propertyInfo, AccessLevels accessLevel)
+        public virtual void VerifyIsWriteonly(PropertyDescription propertyInfo, AccessLevels accessLevel)
         {
             VerifyCanWrite(propertyInfo, canWrite: true);
             VerifyAccessLevel(propertyInfo, new[] { accessLevel }, SetMethod: true);
@@ -613,7 +614,7 @@ namespace TestTools.Structure
             if (!propertyInfo.CanWrite)
                 return;
 
-            AccessLevels getMethodAccessLevel = ReflectionHelper.GetAccessLevel(propertyInfo.GetMethod);
+            AccessLevels getMethodAccessLevel = DescriptionHelper.GetAccessLevel(propertyInfo.GetMethod);
 
             if (accessLevel == AccessLevels.Protected)
             {
@@ -641,7 +642,7 @@ namespace TestTools.Structure
             else throw new NotImplementedException();
         }
 
-        public virtual void VerifyCanWrite(PropertyInfo propertyInfo, bool canWrite)
+        public virtual void VerifyCanWrite(PropertyDescription propertyInfo, bool canWrite)
         {
             if (propertyInfo.CanWrite == canWrite)
                 return;
@@ -655,10 +656,10 @@ namespace TestTools.Structure
             Fail(message);
         }
 
-        public virtual void VerifyTypeHasMember(Type targetType, string[] memberNames)
+        public virtual void VerifyTypeHasMember(TypeDescription targetType, string[] memberNames)
         {
             string message;
-            MemberInfo[] memberInfos = targetType.GetAllMembers();
+            MemberDescription[] memberInfos = targetType.GetMembers();
 
             if (memberInfos.Any(info => memberNames.Contains(info.Name)))
                 return;

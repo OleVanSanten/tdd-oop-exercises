@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Text;
 using TestTools.Helpers;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure
 {
@@ -16,37 +16,37 @@ namespace TestTools.Structure
             MemberVerificationAspect.MethodAccessLevel
         };
 
-        public override void Verify(MemberInfo originalMember, MemberInfo translatedMember)
+        public override void Verify(MemberDescription originalMember, MemberDescription translatedMember)
         {
-            if (originalMember is ConstructorInfo originalConstructor)
+            if (originalMember is ConstructorDescription originalConstructor)
             {
-                AccessLevels accessLevel = ReflectionHelper.GetAccessLevel(originalConstructor);
+                AccessLevels accessLevel = DescriptionHelper.GetAccessLevel(originalConstructor);
                 Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Constructor });
-                Verifier.VerifyAccessLevel((ConstructorInfo)translatedMember, new[] { accessLevel });
+                Verifier.VerifyAccessLevel((ConstructorDescription)translatedMember, new[] { accessLevel });
             }
-            else if (originalMember is FieldInfo originalField)
+            else if (originalMember is FieldDescription originalField)
             {
-                AccessLevels accessLevel = ReflectionHelper.GetAccessLevel(originalField);
+                AccessLevels accessLevel = DescriptionHelper.GetAccessLevel(originalField);
 
                 Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Field, MemberTypes.Property });
 
-                if (translatedMember is FieldInfo translatedField)
+                if (translatedMember is FieldDescription translatedField)
                 {
                     Verifier.VerifyAccessLevel(translatedField, new[] { accessLevel });
                 }
-                else if (translatedMember is PropertyInfo translatedProperty)
+                else if (translatedMember is PropertyDescription translatedProperty)
                 {
                     Verifier.VerifyAccessLevel(translatedProperty, new[] { accessLevel }, GetMethod: true, SetMethod: true);
                 }   
             }
-            else if (originalMember is PropertyInfo originalProperty)
+            else if (originalMember is PropertyDescription originalProperty)
             {
-                AccessLevels? accessLevel1 = originalProperty.CanRead ? ReflectionHelper.GetAccessLevel(originalProperty.GetMethod) : (AccessLevels?)null;
-                AccessLevels? accessLevel2 = originalProperty.CanWrite ? ReflectionHelper.GetAccessLevel(originalProperty.SetMethod) : (AccessLevels?)null;
+                AccessLevels? accessLevel1 = originalProperty.CanRead ? DescriptionHelper.GetAccessLevel(originalProperty.GetMethod) : (AccessLevels?)null;
+                AccessLevels? accessLevel2 = originalProperty.CanWrite ? DescriptionHelper.GetAccessLevel(originalProperty.SetMethod) : (AccessLevels?)null;
 
                 Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Field, MemberTypes.Property });
 
-                if (translatedMember is FieldInfo translatedField)
+                if (translatedMember is FieldDescription translatedField)
                 {
                     if (accessLevel1 != null && accessLevel2 != null)
                     {
@@ -61,7 +61,7 @@ namespace TestTools.Structure
                         Verifier.VerifyAccessLevel(translatedField, new[] { (AccessLevels)accessLevel2 });
                     }
                 }
-                else if (translatedMember is PropertyInfo translatedProperty)
+                else if (translatedMember is PropertyDescription translatedProperty)
                 {
                     if (accessLevel1 != null)
                         Verifier.VerifyAccessLevel(translatedProperty, new[] { (AccessLevels)accessLevel1 }, GetMethod: true);
@@ -69,11 +69,11 @@ namespace TestTools.Structure
                     Verifier.VerifyAccessLevel(translatedProperty, new[] { (AccessLevels)accessLevel2 }, SetMethod: true);
                 }
             }
-            else if (translatedMember is MethodInfo originalMethod)
+            else if (translatedMember is MethodDescription originalMethod)
             {
-                AccessLevels accessLevel = ReflectionHelper.GetAccessLevel(originalMethod);
+                AccessLevels accessLevel = DescriptionHelper.GetAccessLevel(originalMethod);
                 Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Method });
-                Verifier.VerifyAccessLevel((MethodInfo)translatedMember, new[] { accessLevel });
+                Verifier.VerifyAccessLevel((MethodDescription)translatedMember, new[] { accessLevel });
             }
             else throw new NotImplementedException();
         }

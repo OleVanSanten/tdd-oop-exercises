@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Text;
 using TestTools.Helpers;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure
 {
@@ -14,10 +14,10 @@ namespace TestTools.Structure
             MemberVerificationAspect.PropertySetAccessLevel
         };
 
-        public override void Verify(MemberInfo originalMember, MemberInfo translatedMember)
+        public override void Verify(MemberDescription originalMember, MemberDescription translatedMember)
         {
             Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Property });
-            Verifier.VerifyIsWriteonly((PropertyInfo)translatedMember, ReflectionHelper.GetAccessLevel(translatedMember));
+            Verifier.VerifyIsWriteonly((PropertyDescription)translatedMember, DescriptionHelper.GetAccessLevel(translatedMember));
         }
     }
 }

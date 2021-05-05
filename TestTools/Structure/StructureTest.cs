@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using TestTools.Helpers;
 using TestTools.Structure;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure
 {
@@ -21,12 +22,13 @@ namespace TestTools.Structure
 
         public void AssertType(Type type, params ITypeVerifier[] verifiers)
         {
-            _executeAction += () => _structureService.VerifyType(type, verifiers);
+            _executeAction += () => _structureService.VerifyType(new RuntimeTypeDescription(type), verifiers);
         }
 
         public void AssertMember(MemberInfo memberInfo, params IMemberVerifier[] verifiers)
         {
-            _executeAction += () => _structureService.VerifyMember(memberInfo, verifiers);
+            RuntimeDescriptionFactory factory = new RuntimeDescriptionFactory();
+            _executeAction += () => _structureService.VerifyMember(factory.Create(memberInfo), verifiers);
         }
 
         public void Execute()

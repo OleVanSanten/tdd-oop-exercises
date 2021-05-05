@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure
 {
@@ -28,25 +29,25 @@ namespace TestTools.Structure
             MemberVerificationAspect.MethodAccessLevel
         };
 
-        public override void Verify(MemberInfo originalMember, MemberInfo translatedMember)
+        public override void Verify(MemberDescription originalMember, MemberDescription translatedMember)
         {
-            if (translatedMember is ConstructorInfo translatedConstructor)
+            if (translatedMember is ConstructorDescription translatedConstructor)
             {
                 Verifier.VerifyAccessLevel(translatedConstructor, _accessLevels);
             }
-            else if (translatedMember is EventInfo translatedEvent)
+            else if (translatedMember is EventDescription translatedEvent)
             {
                 Verifier.VerifyAccessLevel(translatedEvent, _accessLevels, AddMethod: true, RemoveMethod: true);
             }
-            else if (translatedMember is FieldInfo translatedField)
+            else if (translatedMember is FieldDescription translatedField)
             {
                 Verifier.VerifyAccessLevel(translatedField, _accessLevels);
             }
-            else if (translatedMember is PropertyInfo translatedProperty)
+            else if (translatedMember is PropertyDescription translatedProperty)
             {
                 Verifier.VerifyAccessLevel(translatedProperty, _accessLevels, GetMethod: true, SetMethod: true);
             }
-            else if (translatedMember is MethodInfo translatedMethod)
+            else if (translatedMember is MethodDescription translatedMethod)
             {
                 Verifier.VerifyAccessLevel(translatedMethod, _accessLevels);
             }

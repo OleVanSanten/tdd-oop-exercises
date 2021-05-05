@@ -8,36 +8,36 @@ namespace TestTools.TypeSystem
 {
     public class RuntimeMethodDescription : MethodDescription
     {
-        MethodInfo _methodInfo;
-
         public RuntimeMethodDescription(MethodInfo methodInfo)
         {
-            _methodInfo = methodInfo;
+            MethodInfo = methodInfo;
         }
 
-        public override TypeDescription DeclaringType => new RuntimeTypeDescription(_methodInfo.DeclaringType);
+        public MethodInfo MethodInfo { get; }
 
-        public override bool IsAbstract => _methodInfo.IsAbstract;
+        public override TypeDescription DeclaringType => new RuntimeTypeDescription(MethodInfo.DeclaringType);
 
-        public override bool IsAssembly => _methodInfo.IsAssembly;
+        public override bool IsAbstract => MethodInfo.IsAbstract;
 
-        public override bool IsFamily => _methodInfo.IsFamily;
+        public override bool IsAssembly => MethodInfo.IsAssembly;
 
-        public override bool IsPrivate => _methodInfo.IsPrivate;
+        public override bool IsFamily => MethodInfo.IsFamily;
 
-        public override bool IsPublic => _methodInfo.IsPublic;
+        public override bool IsPrivate => MethodInfo.IsPrivate;
 
-        public override bool IsStatic => _methodInfo.IsStatic;
+        public override bool IsPublic => MethodInfo.IsPublic;
 
-        public override bool IsVirtual => _methodInfo.IsVirtual;
+        public override bool IsStatic => MethodInfo.IsStatic;
 
-        public override string Name => _methodInfo.Name;
+        public override bool IsVirtual => MethodInfo.IsVirtual;
 
-        public override TypeDescription ReturnType => new RuntimeTypeDescription(_methodInfo.ReturnType);
+        public override string Name => MethodInfo.Name;
+
+        public override TypeDescription ReturnType => new RuntimeTypeDescription(MethodInfo.ReturnType);
 
         public override ParameterDescription[] GetParameters()
         {
-            return _methodInfo.GetParameters().Select(i => new RuntimeParameterDescription(i)).ToArray();
+            return MethodInfo.GetParameters().Select(i => new RuntimeParameterDescription(i)).ToArray();
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Text;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure
 {
@@ -20,15 +20,15 @@ namespace TestTools.Structure
             MemberVerificationAspect.MethodIsAbstract
         };
 
-        public override void Verify(MemberInfo originalMember, MemberInfo translatedMember)
+        public override void Verify(MemberDescription originalMember, MemberDescription translatedMember)
         {
             Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Property, MemberTypes.Method });
 
-            if (translatedMember is PropertyInfo translatedProperty)
+            if (translatedMember is PropertyDescription translatedProperty)
             {
                 Verifier.VerifyIsAbstract(translatedProperty, _isAbstract);
             }
-            else if (translatedMember is MethodInfo translatedMethod)
+            else if (translatedMember is MethodDescription translatedMethod)
             {
                 Verifier.VerifyIsAbstract(translatedMethod, _isAbstract);
             }

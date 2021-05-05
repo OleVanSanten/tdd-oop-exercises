@@ -7,25 +7,25 @@ namespace TestTools.TypeSystem
 {
     public class CompileTimePropertyDescription : PropertyDescription
     {
-        IPropertySymbol _propertySymbol;
-
         public CompileTimePropertyDescription(IPropertySymbol propertySymbol)
         {
-            _propertySymbol = propertySymbol;
+            PropertySymbol = propertySymbol;
         }
 
-        public override bool CanRead => _propertySymbol.GetMethod != null;
+        public IPropertySymbol PropertySymbol { get; }
 
-        public override bool CanWrite => _propertySymbol.SetMethod != null;
+        public override bool CanRead => PropertySymbol.GetMethod != null;
 
-        public override TypeDescription DeclaringType => new CompileTimeTypeDescription(_propertySymbol.ContainingType);
+        public override bool CanWrite => PropertySymbol.SetMethod != null;
 
-        public override MethodDescription GetMethod => throw new NotImplementedException();
+        public override TypeDescription DeclaringType => new CompileTimeTypeDescription(PropertySymbol.ContainingType);
 
-        public override string Name => _propertySymbol.Name;
+        public override MethodDescription GetMethod => PropertySymbol.GetMethod != null ? new CompileTimeMethodDescription(PropertySymbol.GetMethod) : null;
 
-        public override TypeDescription PropertyType => new CompileTimeTypeDescription(_propertySymbol.Type);
+        public override string Name => PropertySymbol.Name;
 
-        public override MethodDescription SetMethod => throw new NotImplementedException();
+        public override TypeDescription PropertyType => new CompileTimeTypeDescription(PropertySymbol.Type);
+
+        public override MethodDescription SetMethod => PropertySymbol.SetMethod != null ? new CompileTimeMethodDescription(PropertySymbol.SetMethod) : null;
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Text;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure
 {
@@ -20,19 +20,19 @@ namespace TestTools.Structure
             MemberVerificationAspect.PropertyIsStatic
         };
 
-        public override void Verify(MemberInfo originalMember, MemberInfo translatedMember)
+        public override void Verify(MemberDescription originalMember, MemberDescription translatedMember)
         {
             Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Field, MemberTypes.Property, MemberTypes.Method });
 
-            if (translatedMember is FieldInfo translatedField)
+            if (translatedMember is FieldDescription translatedField)
             {
                 Verifier.VerifyIsStatic(translatedField, _isStatic);
             }
-            else if (translatedMember is PropertyInfo translatedProperty)
+            else if (translatedMember is PropertyDescription translatedProperty)
             {
                 Verifier.VerifyIsStatic(translatedProperty, _isStatic);
             }
-            else if (translatedMember is MethodInfo translatedMethod)
+            else if (translatedMember is MethodDescription translatedMethod)
             {
                 Verifier.VerifyIsStatic(translatedMethod, _isStatic);
             }

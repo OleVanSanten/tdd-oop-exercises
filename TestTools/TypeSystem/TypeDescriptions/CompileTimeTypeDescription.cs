@@ -7,22 +7,25 @@ namespace TestTools.TypeSystem
 {
     public class CompileTimeTypeDescription : TypeDescription
     {
-        ITypeSymbol _typeSymbol;
-
         public CompileTimeTypeDescription(ITypeSymbol typeSymbol)
         {
-            _typeSymbol = typeSymbol;
+            if (typeSymbol == null)
+                throw new ArgumentNullException();
+
+            TypeSymbol = typeSymbol;
         }
 
-        public override TypeDescription BaseType => new CompileTimeTypeDescription(_typeSymbol.BaseType);
+        public ITypeSymbol TypeSymbol { get; }
 
-        public override string Name => _typeSymbol.Name;
+        public override TypeDescription BaseType => new CompileTimeTypeDescription(TypeSymbol.BaseType);
+
+        public override string Name => TypeSymbol.Name;
 
         public override string Namespace
         {
             get
             {
-                INamespaceSymbol namespaceSymbol = _typeSymbol.ContainingNamespace;
+                INamespaceSymbol namespaceSymbol = TypeSymbol.ContainingNamespace;
 
                 if (namespaceSymbol == null)
                     throw new NotImplementedException("Types in global namespaces are not supported");
@@ -31,25 +34,25 @@ namespace TestTools.TypeSystem
             }
         }
 
-        public override bool IsAbstract => _typeSymbol.IsAbstract;
+        public override bool IsAbstract => TypeSymbol.IsAbstract;
 
-        public override bool IsArray => _typeSymbol.TypeKind == TypeKind.Array;
+        public override bool IsArray => TypeSymbol.TypeKind == TypeKind.Array;
 
-        public override bool IsClass => _typeSymbol.TypeKind == TypeKind.Class;
+        public override bool IsClass => TypeSymbol.TypeKind == TypeKind.Class;
 
-        public override bool IsEnum => _typeSymbol.TypeKind == TypeKind.Enum;
+        public override bool IsEnum => TypeSymbol.TypeKind == TypeKind.Enum;
 
-        public override bool IsInterface => _typeSymbol.TypeKind == TypeKind.Interface;
+        public override bool IsInterface => TypeSymbol.TypeKind == TypeKind.Interface;
 
-        public override bool IsNotPublic => throw new NotImplementedException();
+        public override bool IsNotPublic => !IsPublic;
 
-        public override bool IsPublic => throw new NotImplementedException();
+        public override bool IsPublic => TypeSymbol.DeclaredAccessibility == Accessibility.Public;
 
-        public override bool IsSealed => _typeSymbol.IsSealed;
+        public override bool IsSealed => TypeSymbol.IsSealed;
 
         public override ConstructorDescription[] GetConstructors()
         {
-            var members = _typeSymbol.GetMembers();
+            var members = TypeSymbol.GetMembers();
             var output = new List<CompileTimeConstructorDescription>();
 
             for (int i = 0; i < members.Length; i++)
@@ -63,7 +66,7 @@ namespace TestTools.TypeSystem
 
         public override EventDescription[] GetEvents()
         {
-            var members = _typeSymbol.GetMembers();
+            var members = TypeSymbol.GetMembers();
             var output = new List<CompileTimeEventDescription>();
 
             for (int i = 0; i < members.Length; i++)
@@ -77,7 +80,7 @@ namespace TestTools.TypeSystem
 
         public override FieldDescription[] GetFields()
         {
-            var members = _typeSymbol.GetMembers();
+            var members = TypeSymbol.GetMembers();
             var output = new List<CompileTimeFieldDescription>();
 
             for (int i = 0; i < members.Length; i++)
@@ -91,7 +94,7 @@ namespace TestTools.TypeSystem
 
         public override TypeDescription[] GetInterfaces()
         {
-            var interfaces = _typeSymbol.AllInterfaces;
+            var interfaces = TypeSymbol.AllInterfaces;
             var output = new List<CompileTimeTypeDescription>();
 
             for (int i = 0; i < interfaces.Length; i++)
@@ -104,12 +107,12 @@ namespace TestTools.TypeSystem
 
         public override MethodDescription[] GetMethods()
         {
-            var members = _typeSymbol.GetMembers();
+            var members = TypeSymbol.GetMembers();
             var output = new List<CompileTimeMethodDescription>();
 
             for (int i = 0; i < members.Length; i++)
             {
-                if (members[i] is IMethodSymbol method && method.MethodKind == MethodKind.DeclareMethod)
+                if (members[i] is IMethodSymbol method && method.MethodKind == MethodKind.Ordinary)
                     output.Add(new CompileTimeMethodDescription(method));
             }
 
@@ -118,7 +121,7 @@ namespace TestTools.TypeSystem
 
         public override TypeDescription[] GetNestedTypes()
         {
-            var nestedTypes = _typeSymbol.GetTypeMembers();
+            var nestedTypes = TypeSymbol.GetTypeMembers();
             var output = new List<CompileTimeTypeDescription>();
 
             for(int i = 0; i < nestedTypes.Length; i++)
@@ -131,7 +134,7 @@ namespace TestTools.TypeSystem
 
         public override PropertyDescription[] GetProperties()
         {
-            var members = _typeSymbol.GetMembers();
+            var members = TypeSymbol.GetMembers();
             var output = new List<CompileTimePropertyDescription>();
 
             for(int i = 0; i < members.Length; i++)

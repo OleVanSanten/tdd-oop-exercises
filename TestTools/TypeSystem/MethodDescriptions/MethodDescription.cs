@@ -12,7 +12,5 @@ namespace TestTools.TypeSystem
         public override MemberTypes MemberType => MemberTypes.Method;
 
         public abstract TypeDescription ReturnType { get; }
-
-        public abstract ParameterDescription[] GetParameters();
     }
 }

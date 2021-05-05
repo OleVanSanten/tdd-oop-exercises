@@ -7,24 +7,24 @@ namespace TestTools.TypeSystem
 {
     public class CompileTimeFieldDescription : FieldDescription
     {
-        IFieldSymbol _fieldSymbol;
-
         public CompileTimeFieldDescription(IFieldSymbol fieldSymbol)
         {
-            _fieldSymbol = fieldSymbol;
+            FieldSymbol = fieldSymbol;
         }
 
-        public override TypeDescription DeclaringType => new CompileTimeTypeDescription(_fieldSymbol.ContainingType);
+        public IFieldSymbol FieldSymbol { get; }
 
-        public override TypeDescription FieldType => new CompileTimeTypeDescription(_fieldSymbol.Type);
+        public override TypeDescription DeclaringType => new CompileTimeTypeDescription(FieldSymbol.ContainingType);
+
+        public override TypeDescription FieldType => new CompileTimeTypeDescription(FieldSymbol.Type);
 
         public override bool IsAssembly
         {
             get
             {
-                bool isInternal = _fieldSymbol.DeclaredAccessibility == Accessibility.Internal;
-                bool isProtectedAndInternal = _fieldSymbol.DeclaredAccessibility == Accessibility.ProtectedAndInternal;
-                bool isProtectedOrInternal = _fieldSymbol.DeclaredAccessibility == Accessibility.ProtectedOrInternal;
+                bool isInternal = FieldSymbol.DeclaredAccessibility == Accessibility.Internal;
+                bool isProtectedAndInternal = FieldSymbol.DeclaredAccessibility == Accessibility.ProtectedAndInternal;
+                bool isProtectedOrInternal = FieldSymbol.DeclaredAccessibility == Accessibility.ProtectedOrInternal;
 
                 return isInternal || isProtectedAndInternal || isProtectedOrInternal;
             }
@@ -34,30 +34,30 @@ namespace TestTools.TypeSystem
         {
             get
             {
-                bool isProtected = _fieldSymbol.DeclaredAccessibility == Accessibility.Protected;
-                bool isProtectedAndFriend = _fieldSymbol.DeclaredAccessibility == Accessibility.ProtectedAndFriend;
+                bool isProtected = FieldSymbol.DeclaredAccessibility == Accessibility.Protected;
+                bool isProtectedAndFriend = FieldSymbol.DeclaredAccessibility == Accessibility.ProtectedAndFriend;
 
                 return isProtected || isProtectedAndFriend;
             }
         }
 
-        public override bool IsInitOnly => _fieldSymbol.IsReadOnly;
+        public override bool IsInitOnly => FieldSymbol.IsReadOnly;
 
         public override bool IsPrivate
         {
             get
             {
-                bool isNotApplicable = _fieldSymbol.DeclaredAccessibility == Accessibility.NotApplicable;
-                bool isPrivate = _fieldSymbol.DeclaredAccessibility == Accessibility.Private;
+                bool isNotApplicable = FieldSymbol.DeclaredAccessibility == Accessibility.NotApplicable;
+                bool isPrivate = FieldSymbol.DeclaredAccessibility == Accessibility.Private;
 
                 return isNotApplicable || isPrivate;
             }
         }
 
-        public override bool IsPublic => _fieldSymbol.DeclaredAccessibility == Accessibility.Public;
+        public override bool IsPublic => FieldSymbol.DeclaredAccessibility == Accessibility.Public;
 
-        public override bool IsStatic => _fieldSymbol.IsStatic;
+        public override bool IsStatic => FieldSymbol.IsStatic;
 
-        public override string Name => _fieldSymbol.Name;
+        public override string Name => FieldSymbol.Name;
     }
 }

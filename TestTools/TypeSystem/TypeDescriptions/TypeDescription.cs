@@ -10,6 +10,8 @@ namespace TestTools.TypeSystem
     {
         public abstract TypeDescription BaseType { get; }
 
+        public virtual string FullName => $"{Namespace}.{Name}";
+
         public abstract ConstructorDescription[] GetConstructors();
 
         public abstract EventDescription[] GetEvents();
@@ -22,6 +24,7 @@ namespace TestTools.TypeSystem
         {
             return Enumerable
                 .Empty<MemberDescription>()
+                .Union(GetConstructors())
                 .Union(GetEvents())
                 .Union(GetFields())
                 .Union(GetMethods())
@@ -54,5 +57,34 @@ namespace TestTools.TypeSystem
         public abstract bool IsPublic { get; }
 
         public abstract bool IsSealed { get; }
+
+        public override bool Equals(object obj)
+        {
+            TypeDescription other = obj as TypeDescription;
+            return FullName == other?.FullName;
+        }
+
+        public override int GetHashCode()
+        {
+            return FullName.GetHashCode();
+        }
+
+        // System.Type overloads == operator, so to fully compatible this is as well 
+        public static bool operator== (TypeDescription t1, TypeDescription t2)
+        {
+            if (t1 is null || t2 is null)
+                return t1 is null && t2 is null;
+
+            return t1.Equals(t2);
+        }
+
+        // System.Type overloads != operator, so to fully compatible this is as well 
+        public static bool operator!= (TypeDescription t1, TypeDescription t2)
+        {
+            if (t1 is null || t2 is null)
+                return !(t1 is null && t2 is null);
+
+            return !t1.Equals(t2);
+        }
     }
 }

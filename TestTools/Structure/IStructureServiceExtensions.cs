@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
 using System.Linq;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure
 {
     public static class IStructureServiceExtensions
     {
         // Only uses a subset of the verifiers (keeps order)
-        public static void VerifyType(this IStructureService service, Type original, ITypeVerifier[] verifiers, params TypeVerificationAspect[] aspects)
+        public static void VerifyType(this IStructureService service, TypeDescription original, ITypeVerifier[] verifiers, params TypeVerificationAspect[] aspects)
         {
             List<ITypeVerifier> verifierSubset = new List<ITypeVerifier>();
 
@@ -30,7 +31,7 @@ namespace TestTools.Structure
         }
 
         // Only uses a subset of the verifiers (keeps order)
-        public static void VerifyMember(this IStructureService service,  MemberInfo original, IMemberVerifier[] verifiers, params MemberVerificationAspect[] aspects)
+        public static void VerifyMember(this IStructureService service,  MemberDescription original, IMemberVerifier[] verifiers, params MemberVerificationAspect[] aspects)
         {
             List<IMemberVerifier> verifierSubset = new List<IMemberVerifier>();
 

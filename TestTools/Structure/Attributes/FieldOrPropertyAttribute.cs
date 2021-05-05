@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Reflection;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure.Attributes
 {
@@ -13,7 +13,7 @@ namespace TestTools.Structure.Attributes
 
         public IStructureService Service { get; set; }
 
-        public void Verify( MemberInfo originalMember, MemberInfo translatedMember)
+        public void Verify(MemberDescription originalMember, MemberDescription translatedMember)
         {
             Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Field, MemberTypes.Property });
         }

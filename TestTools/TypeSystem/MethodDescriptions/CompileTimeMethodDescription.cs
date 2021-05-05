@@ -7,24 +7,24 @@ namespace TestTools.TypeSystem
 {
     public class CompileTimeMethodDescription : MethodDescription
     {
-        IMethodSymbol _methodSymbol;
-
         public CompileTimeMethodDescription(IMethodSymbol methodSymbol)
         {
-            _methodSymbol = methodSymbol;
+            MethodSymbol = methodSymbol;
         }
 
-        public override TypeDescription DeclaringType => new CompileTimeTypeDescription(_methodSymbol.ContainingType);
+       public IMethodSymbol MethodSymbol { get; }
 
-        public override bool IsAbstract => _methodSymbol.IsAbstract;
+        public override TypeDescription DeclaringType => new CompileTimeTypeDescription(MethodSymbol.ContainingType);
+
+        public override bool IsAbstract => MethodSymbol.IsAbstract;
 
         public override bool IsAssembly
         {
             get
             {
-                bool isInternal = _methodSymbol.DeclaredAccessibility == Accessibility.Internal;
-                bool isProtectedAndInternal = _methodSymbol.DeclaredAccessibility == Accessibility.ProtectedAndInternal;
-                bool isProtectedOrInternal = _methodSymbol.DeclaredAccessibility == Accessibility.ProtectedOrInternal;
+                bool isInternal = MethodSymbol.DeclaredAccessibility == Accessibility.Internal;
+                bool isProtectedAndInternal = MethodSymbol.DeclaredAccessibility == Accessibility.ProtectedAndInternal;
+                bool isProtectedOrInternal = MethodSymbol.DeclaredAccessibility == Accessibility.ProtectedOrInternal;
 
                 return isInternal || isProtectedAndInternal || isProtectedOrInternal;
             }
@@ -34,8 +34,8 @@ namespace TestTools.TypeSystem
         {
             get
             {
-                bool isProtected = _methodSymbol.DeclaredAccessibility == Accessibility.Protected;
-                bool isProtectedAndFriend = _methodSymbol.DeclaredAccessibility == Accessibility.ProtectedAndFriend;
+                bool isProtected = MethodSymbol.DeclaredAccessibility == Accessibility.Protected;
+                bool isProtectedAndFriend = MethodSymbol.DeclaredAccessibility == Accessibility.ProtectedAndFriend;
 
                 return isProtected || isProtectedAndFriend;
             }
@@ -45,26 +45,26 @@ namespace TestTools.TypeSystem
         {
             get
             {
-                bool isNotApplicable = _methodSymbol.DeclaredAccessibility == Accessibility.NotApplicable;
-                bool isPrivate = _methodSymbol.DeclaredAccessibility == Accessibility.Private;
+                bool isNotApplicable = MethodSymbol.DeclaredAccessibility == Accessibility.NotApplicable;
+                bool isPrivate = MethodSymbol.DeclaredAccessibility == Accessibility.Private;
 
                 return isNotApplicable || isPrivate;
             }
         }
 
-        public override bool IsPublic => _methodSymbol.DeclaredAccessibility == Accessibility.Public;
+        public override bool IsPublic => MethodSymbol.DeclaredAccessibility == Accessibility.Public;
 
-        public override bool IsStatic => _methodSymbol.IsStatic;
+        public override bool IsStatic => MethodSymbol.IsStatic;
 
-        public override bool IsVirtual => _methodSymbol.IsVirtual;
+        public override bool IsVirtual => MethodSymbol.IsVirtual;
 
-        public override string Name => _methodSymbol.Name;
+        public override string Name => MethodSymbol.Name;
 
-        public override TypeDescription ReturnType => new CompileTimeTypeDescription(_methodSymbol.ReturnType);
+        public override TypeDescription ReturnType => new CompileTimeTypeDescription(MethodSymbol.ReturnType);
 
         public override ParameterDescription[] GetParameters()
         {
-            var parameters = _methodSymbol.Parameters;
+            var parameters = MethodSymbol.Parameters;
             var output = new List<CompileTimeParameterDescription>();
 
             for(int i = 0; i < parameters.Length; i++)

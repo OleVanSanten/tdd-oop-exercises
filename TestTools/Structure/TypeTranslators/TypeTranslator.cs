@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure
 {
     public abstract class TypeTranslator : ITypeTranslator
     {
-        public string TargetNamespace { get; set; }
+        public NamespaceDescription TargetNamespace { get; set; }
 
         public VerifierServiceBase Verifier { get; set; }
 
-        public abstract Type Translate(Type type);
+        public abstract TypeDescription Translate(TypeDescription type);
     }
 }

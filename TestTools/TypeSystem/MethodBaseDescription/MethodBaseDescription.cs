@@ -21,5 +21,7 @@ namespace TestTools.TypeSystem
         public abstract bool IsStatic { get; }
 
         public abstract bool IsVirtual { get; }
+
+        public abstract ParameterDescription[] GetParameters();
     }
 }

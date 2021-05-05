@@ -7,25 +7,25 @@ namespace TestTools.TypeSystem
 {
     public class RuntimePropertyDescription : PropertyDescription
     {
-        PropertyInfo _propertyInfo;
-
         public RuntimePropertyDescription(PropertyInfo propertyInfo)
         {
-            _propertyInfo = propertyInfo;
+            PropertyInfo = propertyInfo;
         }
 
-        public override bool CanRead => _propertyInfo.CanRead;
+        public PropertyInfo PropertyInfo { get; }
 
-        public override bool CanWrite => _propertyInfo.CanWrite;
+        public override bool CanRead => PropertyInfo.CanRead;
 
-        public override TypeDescription DeclaringType => new RuntimeTypeDescription(_propertyInfo.DeclaringType);
+        public override bool CanWrite => PropertyInfo.CanWrite;
 
-        public override MethodDescription GetMethod => throw new NotImplementedException();
+        public override TypeDescription DeclaringType => new RuntimeTypeDescription(PropertyInfo.DeclaringType);
 
-        public override string Name => _propertyInfo.Name;
+        public override MethodDescription GetMethod => PropertyInfo.CanRead ? new RuntimeMethodDescription(PropertyInfo.GetMethod) : null;
 
-        public override TypeDescription PropertyType => new RuntimeTypeDescription(_propertyInfo.PropertyType);
+        public override string Name => PropertyInfo.Name;
 
-        public override MethodDescription SetMethod => throw new NotImplementedException();
+        public override TypeDescription PropertyType => new RuntimeTypeDescription(PropertyInfo.PropertyType);
+
+        public override MethodDescription SetMethod => PropertyInfo.CanWrite ? new RuntimeMethodDescription(PropertyInfo.SetMethod) : null;
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Reflection;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure
 {
@@ -13,22 +13,22 @@ namespace TestTools.Structure
             MemberVerificationAspect.MethodIsVirtual
         };
 
-        public override void Verify(MemberInfo originalMember, MemberInfo translatedMember)
+        public override void Verify(MemberDescription originalMember, MemberDescription translatedMember)
         {
-            if (originalMember is PropertyInfo originalProperty)
+            if (originalMember is PropertyDescription originalProperty)
             {
                 Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Property });
 
                 if (originalProperty.CanRead)
-                    Verifier.VerifyIsVirtual((PropertyInfo)translatedMember, originalProperty.GetMethod.IsVirtual, GetMethod: true);
+                    Verifier.VerifyIsVirtual((PropertyDescription)translatedMember, originalProperty.GetMethod.IsVirtual, GetMethod: true);
 
                 if (originalProperty.CanWrite)
-                    Verifier.VerifyIsVirtual((PropertyInfo)translatedMember, originalProperty.SetMethod.IsVirtual, SetMethod: true);
+                    Verifier.VerifyIsVirtual((PropertyDescription)translatedMember, originalProperty.SetMethod.IsVirtual, SetMethod: true);
             }
-            else if (translatedMember is MethodInfo originalMethod)
+            else if (translatedMember is MethodDescription originalMethod)
             {
                 Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Method });
-                Verifier.VerifyIsStatic((MethodInfo)translatedMember, originalMethod.IsStatic);
+                Verifier.VerifyIsStatic((MethodDescription)translatedMember, originalMethod.IsStatic);
             }
             else throw new NotImplementedException();
         }

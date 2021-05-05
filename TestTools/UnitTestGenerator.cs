@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using TestTools.Structure;
+using TestTools.TypeSystem;
 
 namespace TestTools.Templates
 {
@@ -32,10 +33,12 @@ namespace TestTools.Templates
                 return;
 
             var attributeMetadata = context.Compilation.GetTypeByMetadataName("TestTools.Structure.TemplatedAttribute");
-            var translator = new CompilationTypeTranslator(context.Compilation);
-            var service = new StructureService("Lecture_2_Solutions", "Lecture_2_Solutions")
+
+            var globalNamespace = new CompileTimeNamespaceDescription(context.Compilation.GlobalNamespace);
+            var sourceNamespace = globalNamespace.GetNamespace("Lecture_2_Solutions");
+            var targetNamespace = globalNamespace.GetNamespace("Lecture_2");
+            var service = new StructureService(sourceNamespace, targetNamespace)
             {
-                TypeTranslator = translator,
                 StructureVerifier = new VerifierService()
             };
             var rewriter = new TypeRewriter(service, context.Compilation);

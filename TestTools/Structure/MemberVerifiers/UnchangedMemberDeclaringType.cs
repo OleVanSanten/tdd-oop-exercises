@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Text;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure
 {
@@ -13,26 +13,26 @@ namespace TestTools.Structure
             MemberVerificationAspect.PropertySetDeclaringType
         };
 
-        public override void Verify(MemberInfo originalMember, MemberInfo translatedMember)
+        public override void Verify(MemberDescription originalMember, MemberDescription translatedMember)
         {
-            if (originalMember is MethodInfo originalMethod)
+            if (originalMember is MethodDescription originalMethod)
             {
-                Type type = Service.TranslateType(originalMethod.DeclaringType);
+                var type = Service.TranslateType(originalMethod.DeclaringType);
                 Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Method });
-                Verifier.VerifyDeclaringType((MethodInfo)translatedMember, type);
+                Verifier.VerifyDeclaringType((MethodDescription)translatedMember, type);
             }
-            else if (originalMember is PropertyInfo originalProperty)
+            else if (originalMember is PropertyDescription originalProperty)
             {
-                Type type1 = originalProperty.CanRead ? Service.TranslateType(originalProperty.GetMethod.DeclaringType) : null;
-                Type type2 = originalProperty.CanWrite ? Service.TranslateType(originalProperty.SetMethod.DeclaringType) : null;
+                var type1 = originalProperty.CanRead ? Service.TranslateType(originalProperty.GetMethod.DeclaringType) : null;
+                var type2 = originalProperty.CanWrite ? Service.TranslateType(originalProperty.SetMethod.DeclaringType) : null;
 
                 Verifier.VerifyMemberType(translatedMember, new[] { MemberTypes.Field, MemberTypes.Property });
 
-                if (translatedMember is FieldInfo translatedField)
+                if (translatedMember is FieldDescription translatedField)
                 {
                     Verifier.VerifyDeclaringType(translatedField, type1 ?? type2);
                 }
-                else if (translatedMember is PropertyInfo translatedProperty)
+                else if (translatedMember is PropertyDescription translatedProperty)
                 {
                     if (type1 != null)
                         Verifier.VerifyDeclaringType(translatedProperty, type1, GetMethod: true);

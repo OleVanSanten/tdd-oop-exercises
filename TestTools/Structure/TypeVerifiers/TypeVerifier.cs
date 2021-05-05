@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TestTools.TypeSystem;
 
 namespace TestTools.Structure
 {
@@ -12,6 +13,6 @@ namespace TestTools.Structure
 
         public abstract TypeVerificationAspect[] Aspects { get; }
 
-        public abstract void Verify(Type originalType, Type translatedType);
+        public abstract void Verify(TypeDescription originalType, TypeDescription translatedType);
     }
 }

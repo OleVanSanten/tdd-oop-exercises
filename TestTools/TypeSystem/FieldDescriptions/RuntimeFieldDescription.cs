@@ -7,29 +7,29 @@ namespace TestTools.TypeSystem
 {
     public class RuntimeFieldDescription : FieldDescription
     {
-        FieldInfo _fieldInfo;
-
         public RuntimeFieldDescription(FieldInfo fieldInfo)
         {
-            _fieldInfo = fieldInfo;
+            FieldInfo = fieldInfo;
         }
 
-        public override TypeDescription DeclaringType => new RuntimeTypeDescription(_fieldInfo.DeclaringType);
+        public FieldInfo FieldInfo { get; }
 
-        public override TypeDescription FieldType => new RuntimeTypeDescription(_fieldInfo.FieldType);
+        public override TypeDescription DeclaringType => new RuntimeTypeDescription(FieldInfo.DeclaringType);
 
-        public override bool IsAssembly => _fieldInfo.IsAssembly;
+        public override TypeDescription FieldType => new RuntimeTypeDescription(FieldInfo.FieldType);
 
-        public override bool IsFamily => _fieldInfo.IsFamily;
+        public override bool IsAssembly => FieldInfo.IsAssembly;
 
-        public override bool IsInitOnly => _fieldInfo.IsInitOnly;
+        public override bool IsFamily => FieldInfo.IsFamily;
 
-        public override bool IsPrivate => _fieldInfo.IsPrivate;
+        public override bool IsInitOnly => FieldInfo.IsInitOnly;
 
-        public override bool IsPublic => _fieldInfo.IsPublic;
+        public override bool IsPrivate => FieldInfo.IsPrivate;
 
-        public override bool IsStatic => _fieldInfo.IsStatic;
+        public override bool IsPublic => FieldInfo.IsPublic;
 
-        public override string Name => _fieldInfo.Name;
+        public override bool IsStatic => FieldInfo.IsStatic;
+
+        public override string Name => FieldInfo.Name;
     }
 }

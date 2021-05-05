@@ -27,7 +27,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\TestTools\TestTools.csproj"
                       OutputItemType="Analyzer"
-                      ReferenceOutputAssembly="true" />
+                      ReferenceOutputAssembly="false" />
   </ItemGroup>
   
   <ItemGroup>

@@ -8,73 +8,73 @@ namespace TestTools.TypeSystem
 {
     public class RuntimeTypeDescription : TypeDescription
     {
-        Type _type;
-
         public RuntimeTypeDescription(Type type)
         {
-            _type = type;
+            Type = type;
         }
 
-        public override TypeDescription BaseType => new RuntimeTypeDescription(_type.BaseType);
+        public Type Type { get; }
 
-        public override string Name => _type.Name;
+        public override TypeDescription BaseType => new RuntimeTypeDescription(Type.BaseType);
 
-        public override bool IsAbstract => _type.IsAbstract;
+        public override string Name => Type.Name;
 
-        public override bool IsArray => _type.IsArray;
+        public override bool IsAbstract => Type.IsAbstract;
 
-        public override bool IsClass => _type.IsClass;
+        public override bool IsArray => Type.IsArray;
 
-        public override bool IsEnum => _type.IsEnum;
+        public override bool IsClass => Type.IsClass;
 
-        public override bool IsInterface => _type.IsInterface;
+        public override bool IsEnum => Type.IsEnum;
 
-        public override bool IsNotPublic => _type.IsNotPublic;
+        public override bool IsInterface => Type.IsInterface;
 
-        public override bool IsPublic => _type.IsPublic;
+        public override bool IsNotPublic => Type.IsNotPublic;
 
-        public override bool IsSealed => _type.IsSealed;
+        public override bool IsPublic => Type.IsPublic;
 
-        public override string Namespace => _type.Namespace;
+        public override bool IsSealed => Type.IsSealed;
+
+        public override string Namespace => Type.Namespace;
 
         public override ConstructorDescription[] GetConstructors()
         {
-            var allConstructors = _type.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            var allConstructors = Type.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             return allConstructors.Select(c => new RuntimeConstructorDescription(c)).ToArray();
         }
 
         public override EventDescription[] GetEvents()
         {
-            var allEvents = _type.GetEvents(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+            var allEvents = Type.GetEvents(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
             return allEvents.Select(e => new RuntimeEventDescription(e)).ToArray();
         }
 
         public override FieldDescription[] GetFields()
         {
-            var allFields = _type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+            var allFields = Type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
             return allFields.Select(f => new RuntimeFieldDescription(f)).ToArray();
         }
 
         public override TypeDescription[] GetInterfaces()
         {
-            return _type.GetInterfaces().Select(t => new RuntimeTypeDescription(t)).ToArray();
+            return Type.GetInterfaces().Select(t => new RuntimeTypeDescription(t)).ToArray();
         }
 
         public override MethodDescription[] GetMethods()
         {
-            var allMethods = _type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+            var allMethods = Type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
             return allMethods.Select(m => new RuntimeMethodDescription(m)).ToArray();
         }
 
         public override TypeDescription[] GetNestedTypes()
         {
-            var allNestedTypes = _type.GetNestedTypes(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+            var allNestedTypes = Type.GetNestedTypes(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
             return allNestedTypes.Select(t => new RuntimeTypeDescription(t)).ToArray();
         }
 
         public override PropertyDescription[] GetProperties()
         {
-            var allProperties = _type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Instance);
+            var allProperties = Type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Instance);
             return allProperties.Select(p => new RuntimePropertyDescription(p)).ToArray();
         }
     }
