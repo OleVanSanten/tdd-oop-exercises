@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -31,5 +32,16 @@ namespace TestTools.TypeSystem
         public override bool IsStatic => FieldInfo.IsStatic;
 
         public override string Name => FieldInfo.Name;
+
+        public override Attribute[] GetCustomAttributes()
+        {
+            return FieldInfo.GetCustomAttributes().ToArray();
+        }
+
+        public override TypeDescription[] GetCustomAttributeTypes()
+        {
+            var attributes = FieldInfo.GetCustomAttributes();
+            return attributes.Select(t => new RuntimeTypeDescription(t.GetType())).ToArray();
+        }
     }
 }

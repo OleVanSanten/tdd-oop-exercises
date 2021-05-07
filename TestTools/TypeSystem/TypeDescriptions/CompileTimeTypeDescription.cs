@@ -1,7 +1,9 @@
 ﻿using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using TestTools.Helpers;
 
 namespace TestTools.TypeSystem
 {
@@ -59,6 +61,31 @@ namespace TestTools.TypeSystem
             {
                 if (members[i] is IMethodSymbol method && method.MethodKind == MethodKind.Constructor)
                     output.Add(new CompileTimeConstructorDescription(method));
+            }
+
+            return output.ToArray();
+        }
+
+        // Please note, GetCustomAttributes might return fewer results than
+        // GetCustomAttributeTypes, because attributes cannot be loaded from 
+        // non .netstandard2.0 targeting assemblies
+        public override Attribute[] GetCustomAttributes()
+        {
+            return TypeSymbol
+               .GetAttributes()
+               .Select(attributeData => attributeData.ConvertToAttribute())
+               .Where(attribute => attribute != null)
+               .ToArray();
+        }
+
+        public override TypeDescription[] GetCustomAttributeTypes()
+        {
+            var attributes = TypeSymbol.GetAttributes();
+            var output = new List<TypeDescription>();
+
+            for(int i = 0; i < attributes.Length; i++)
+            {
+                output.Add(new CompileTimeTypeDescription(attributes[i].AttributeClass));
             }
 
             return output.ToArray();

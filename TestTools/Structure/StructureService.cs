@@ -79,7 +79,7 @@ namespace TestTools.Structure
 
             if (type.Namespace == FromNamespace.Name)
             {
-                ITypeTranslator translator = /*type.GetCustomTranslator() ??*/ TypeTranslator;
+                ITypeTranslator translator = type.GetCustomTranslator() ?? TypeTranslator;
                 translator.TargetNamespace = ToNamespace;
                 translator.Verifier = StructureVerifier;
 
@@ -101,7 +101,7 @@ namespace TestTools.Structure
             if (memberInfo.DeclaringType.Namespace != FromNamespace.Name)
                 return memberInfo;
             
-            IMemberTranslator translator = /*memberInfo.GetCustomTranslator() ??*/ MemberTranslator;
+            IMemberTranslator translator = memberInfo.GetCustomTranslator() ?? MemberTranslator;
 
             translator.Verifier = StructureVerifier;
             translator.TargetType = TranslateType(memberInfo.DeclaringType);
@@ -114,7 +114,7 @@ namespace TestTools.Structure
             if (memberInfo.DeclaringType.Namespace != FromNamespace.Name)
                 return memberInfo;
 
-            IMemberTranslator translator = /*memberInfo.GetCustomTranslator() ??*/ MemberTranslator;
+            IMemberTranslator translator = memberInfo.GetCustomTranslator() ?? MemberTranslator;
 
             translator.Verifier = StructureVerifier;
             translator.TargetType = targetType;
@@ -129,7 +129,7 @@ namespace TestTools.Structure
             foreach (TypeVerificationAspect aspect in TypeVerificationOrder)
             {
                 ITypeVerifier defaultVerifier = verifiers.FirstOrDefault(ver => ver.Aspects.Contains(aspect));
-                ITypeVerifier verifier = /*original.GetCustomVerifier(aspect) ??*/defaultVerifier;
+                ITypeVerifier verifier = original.GetCustomVerifier(aspect) ?? defaultVerifier;
 
                 if (verifier != null)
                 {
@@ -148,7 +148,7 @@ namespace TestTools.Structure
             foreach (MemberVerificationAspect aspect in MemberVerificationOrder)
             {
                 IMemberVerifier defaultVerifier = verifiers.FirstOrDefault(ver => ver.Aspects.Contains(aspect));
-                IMemberVerifier verifier = /*original.GetCustomVerifier(aspect) ??*/ defaultVerifier;
+                IMemberVerifier verifier = original.GetCustomVerifier(aspect) ?? defaultVerifier;
 
                 if (verifier != null)
                 {

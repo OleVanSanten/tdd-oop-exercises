@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -27,5 +28,15 @@ namespace TestTools.TypeSystem
         public override TypeDescription PropertyType => new RuntimeTypeDescription(PropertyInfo.PropertyType);
 
         public override MethodDescription SetMethod => PropertyInfo.CanWrite ? new RuntimeMethodDescription(PropertyInfo.SetMethod) : null;
+
+        public override Attribute[] GetCustomAttributes()
+        {
+            return PropertyInfo.GetCustomAttributes().ToArray();
+        }
+        public override TypeDescription[] GetCustomAttributeTypes()
+        {
+            var attributes = PropertyInfo.GetCustomAttributes();
+            return attributes.Select(t => new RuntimeTypeDescription(t.GetType())).ToArray();
+        }
     }
 }

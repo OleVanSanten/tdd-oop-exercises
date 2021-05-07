@@ -12,6 +12,10 @@ namespace TestTools.TypeSystem
 
         public virtual string FullName => $"{Namespace}.{Name}";
 
+        public abstract Attribute[] GetCustomAttributes();
+
+        public abstract TypeDescription[] GetCustomAttributeTypes();
+
         public abstract ConstructorDescription[] GetConstructors();
 
         public abstract EventDescription[] GetEvents();

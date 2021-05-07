@@ -43,6 +43,17 @@ namespace TestTools.TypeSystem
             return allConstructors.Select(c => new RuntimeConstructorDescription(c)).ToArray();
         }
 
+        public override Attribute[] GetCustomAttributes()
+        {
+            return Type.GetCustomAttributes().ToArray();
+        }
+
+        public override TypeDescription[] GetCustomAttributeTypes()
+        {
+            var attributes = Type.GetCustomAttributes();
+            return attributes.Select(t => new RuntimeTypeDescription(t.GetType())).ToArray();
+        }
+
         public override EventDescription[] GetEvents()
         {
             var allEvents = Type.GetEvents(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);

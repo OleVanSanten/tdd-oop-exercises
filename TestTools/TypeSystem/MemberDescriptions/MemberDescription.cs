@@ -6,9 +6,11 @@ namespace TestTools.TypeSystem
 {
     public abstract class MemberDescription
     {
-        // Attributes should be runtime, because then they make sense xD
-
         public abstract TypeDescription DeclaringType { get; }
+
+        public abstract Attribute[] GetCustomAttributes();
+
+        public abstract TypeDescription[] GetCustomAttributeTypes();
 
         public abstract MemberTypes MemberType { get; }
 

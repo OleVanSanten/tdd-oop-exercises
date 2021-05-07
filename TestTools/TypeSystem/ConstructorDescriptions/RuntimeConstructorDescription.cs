@@ -33,6 +33,17 @@ namespace TestTools.TypeSystem
 
         public override bool IsVirtual => ConstructorInfo.IsVirtual;
 
+        public override Attribute[] GetCustomAttributes()
+        {
+            return ConstructorInfo.GetCustomAttributes().ToArray();
+        }
+
+        public override TypeDescription[] GetCustomAttributeTypes()
+        {
+            var attributes = ConstructorInfo.GetCustomAttributes();
+            return attributes.Select(t => new RuntimeTypeDescription(t.GetType())).ToArray();
+        }
+
         public override ParameterDescription[] GetParameters()
         {
             var parameters = ConstructorInfo.GetParameters();

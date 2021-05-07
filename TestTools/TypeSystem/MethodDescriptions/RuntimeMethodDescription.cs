@@ -35,6 +35,16 @@ namespace TestTools.TypeSystem
 
         public override TypeDescription ReturnType => new RuntimeTypeDescription(MethodInfo.ReturnType);
 
+        public override Attribute[] GetCustomAttributes()
+        {
+            return MethodInfo.GetCustomAttributes().ToArray();
+        }
+        public override TypeDescription[] GetCustomAttributeTypes()
+        {
+            var attributes = MethodInfo.GetCustomAttributes();
+            return attributes.Select(t => new RuntimeTypeDescription(t.GetType())).ToArray();
+        }
+
         public override ParameterDescription[] GetParameters()
         {
             return MethodInfo.GetParameters().Select(i => new RuntimeParameterDescription(i)).ToArray();
