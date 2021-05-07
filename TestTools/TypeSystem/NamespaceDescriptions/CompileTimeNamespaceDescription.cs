@@ -17,7 +17,7 @@ namespace TestTools.TypeSystem
 
         public override NamespaceDescription ContainingNamespace => new CompileTimeNamespaceDescription(_namespaceSymbol.ContainingNamespace);
 
-        public override string Name => _namespaceSymbol.Name;
+        public override string Name => GetFullName(_namespaceSymbol);
 
         public override NamespaceDescription[] GetNamespaces()
         {
@@ -35,6 +35,23 @@ namespace TestTools.TypeSystem
                 output.Add(new CompileTimeTypeDescription(types[i]));
             }
             return output.ToArray();
+        }
+
+        private string GetFullName(INamespaceSymbol namespaceSymbol)
+        {
+            string output = namespaceSymbol.Name;
+            INamespaceSymbol superNamespace = namespaceSymbol.ContainingNamespace;
+
+            while (superNamespace != null)
+            {
+                if (superNamespace.IsGlobalNamespace)
+                    break;
+
+                output = superNamespace.Name + "." + output;
+                superNamespace = superNamespace.ContainingNamespace;
+            }
+
+            return output;
         }
     }
 }

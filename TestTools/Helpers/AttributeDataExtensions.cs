@@ -20,12 +20,19 @@ namespace TestTools.Helpers
             var runtimeTypeDescription = runtimeNamespace.GetTypes().FirstOrDefault(t => t.Name == typeName);
             var type = (runtimeTypeDescription as RuntimeTypeDescription)?.Type;
 
-            // If the attribute is successfully acquired it is instantiated
+            // If the attribute is successfully acquired, it is instantiated
             if (type != null)
             {
                 var arguments = attributeData.ConstructorArguments.Select(c => c.Value).ToArray();
                 
-                return (Attribute)Activator.CreateInstance(type, arguments);
+                try
+                {
+                    return (Attribute)Activator.CreateInstance(type, arguments);
+                }
+                catch
+                {
+                    return null;
+                }
             }
             else return null;
         }

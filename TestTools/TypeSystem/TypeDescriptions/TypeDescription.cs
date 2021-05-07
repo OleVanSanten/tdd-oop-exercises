@@ -62,6 +62,17 @@ namespace TestTools.TypeSystem
 
         public abstract bool IsSealed { get; }
 
+        public bool IsSubclassOf(TypeDescription typeDescription)
+        {
+            bool result = this.Equals(typeDescription);
+
+            result = result || BaseType.IsSubclassOf(typeDescription);
+
+            result = result || GetInterfaces().Any(i => i.IsSubclassOf(typeDescription));
+
+            return result;
+        }
+
         public override bool Equals(object obj)
         {
             TypeDescription other = obj as TypeDescription;

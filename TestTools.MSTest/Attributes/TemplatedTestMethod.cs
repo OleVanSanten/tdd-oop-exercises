@@ -7,30 +7,11 @@ using TestTools.Templates;
 
 namespace TestTools.MSTest
 {
-    public class TemplatedTestMethod : TemplatedAttribute
+    [AttributeEquivalent("Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod")]
+    public class TemplatedTestMethod : Attribute
     {
-        readonly bool _displayNameSet;
-        readonly string _displayName;
-
-        public TemplatedTestMethod()
+        public TemplatedTestMethod(string message)
         {
-            _displayNameSet = false;
-        }
-
-        public TemplatedTestMethod(string displayName)
-        {
-            _displayName = displayName;
-            _displayNameSet = true;
-        }
-
-        [TestMethod]
-        public override string MakeConcrete()
-        {
-            if (_displayNameSet)
-            {
-                return $"[TestMethod({_displayName})]";
-            }
-            else return "[TestMethod]";
         }
     }
 }

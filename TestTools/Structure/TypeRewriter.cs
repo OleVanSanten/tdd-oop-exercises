@@ -42,10 +42,20 @@ namespace TestTools.Structure
 
         public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
         {
+            // Only classes marked with an attritubes that are marked with TemplatedAttribute should be rewritten
+            var type = GetTypeDescription(node);
+            var attributesOfAttributes = type.GetCustomAttributeTypes().SelectMany(t => t.GetCustomAttributes());
+            if (!attributesOfAttributes.Any(a => a is AttributeEquivalentAttribute))
+                return node;
+
+            // Potentially rewritting the class name by removing _Templated from it
             var newClassName = node.Identifier.Text.Replace("_Template", "");
             var newIdentifier = SyntaxFactory.IdentifierName(newClassName).Identifier;
 
+            // Potentially rewritting the class members
             var newMembers = new SyntaxList<SyntaxNode>(node.Members.Select(Visit));
+
+            // Potentially rewritting attributes
             var newAttributeLists = new SyntaxList<AttributeListSyntax>(node.AttributeLists.Select(Visit).OfType<AttributeListSyntax>());
 
             return node.WithIdentifier(newIdentifier).WithMembers(newMembers).WithAttributeLists(newAttributeLists);
@@ -53,25 +63,36 @@ namespace TestTools.Structure
 
         public override SyntaxNode VisitAttribute(AttributeSyntax node)
         {
-            var newAttributeName = node.Name.ToString().Replace("Templated", "");
-            var newName = SyntaxFactory.IdentifierName(newAttributeName);
+            var templatedAttribute = GetTemplatedAttribute(node);
 
+            if (templatedAttribute == null)
+                return node;
+
+            // Rewritting templated-attribute type to non-templated-attribute type
+            var newName = SyntaxFactory.IdentifierName(templatedAttribute.EquavilentAttribute);
+            
             return node.WithName(newName);
         }
 
         public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
         {
-            // Only methods marked with [Templated*] should be rewritten
-            if (!node.AttributeLists.SelectMany(l => l.Attributes).Any(a => a.ToString().Contains("Templated")))
+            // Only methods marked with an attritubes that are marked with TemplatedAttribute should be rewritten
+            var method = GetMethodDescription(node);
+            var attributesOfAttributes = method.GetCustomAttributeTypes().SelectMany(t => t.GetCustomAttributes());
+            if (!attributesOfAttributes.Any(a => a is AttributeEquivalentAttribute))
                 return node;
 
+            // Rewritting the method body to switch out all FromNamespace members with ToNamespace members
+            // If the rewrite is unsuccessful due to validation errors, the entire method body is replaced
+            // with an exception 
+            // and if the rewrite validation fails replacing the entire body with an exception
             BlockSyntax newBody;
             var newAttributeLists = new SyntaxList<AttributeListSyntax>(node.AttributeLists.Select(Visit).OfType<AttributeListSyntax>());
 
             try
             {
                 var newStatements = new SyntaxList<StatementSyntax>(node.Body.Statements.Select(Visit).OfType<StatementSyntax>());
-                newBody = SyntaxFactory.Block(newStatements);
+                newBody = SyntaxFactory.Block(newStatements); 
             }
             catch (VerifierServiceException ex)
             {
@@ -198,6 +219,30 @@ namespace TestTools.Structure
             return new CompileTimeTypeDescription(typeSymbol);
         }
 
+        TypeDescription GetTypeDescription(ClassDeclarationSyntax node)
+        {
+            var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
+            var typeModel = semanticModel.GetDeclaredSymbol(node);
+
+            return new CompileTimeTypeDescription(typeModel);
+        }
+
+        // Returns TemplatedAttribute object if attribute class is marked with [TemplatedAttribute]
+        AttributeEquivalentAttribute GetTemplatedAttribute(AttributeSyntax node)
+        {
+            var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
+            var attributeSymbol = (IMethodSymbol)semanticModel.GetSymbolInfo(node).Symbol;
+            var attributeClass = attributeSymbol.ContainingType;
+            var attributeDescription = new CompileTimeTypeDescription(attributeClass);
+
+            // Check if it contains any TemplateEquivalentAttribute at all
+            var targetAttribute = new RuntimeTypeDescription(typeof(AttributeEquivalentAttribute));
+            if (!attributeDescription.GetCustomAttributeTypes().Contains(targetAttribute))
+                return null;
+
+            return attributeDescription.GetCustomAttributes().OfType<AttributeEquivalentAttribute>().FirstOrDefault();
+        }
+
         ConstructorDescription GetConstructorDescription(ObjectCreationExpressionSyntax node)
         {
             var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
@@ -228,6 +273,14 @@ namespace TestTools.Structure
         {
             var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
             var methodSymbol = (IMethodSymbol)semanticModel.GetSymbolInfo(node).Symbol;
+
+            return new CompileTimeMethodDescription(methodSymbol);
+        }
+
+        MethodDescription GetMethodDescription(MethodDeclarationSyntax node)
+        {
+            var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
+            var methodSymbol = semanticModel.GetDeclaredSymbol(node);
 
             return new CompileTimeMethodDescription(methodSymbol);
         }

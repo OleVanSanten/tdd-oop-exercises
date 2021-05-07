@@ -32,7 +32,7 @@ namespace TestTools.Templates
             if (syntaxReceiver == null)
                 return;
 
-            var attributeMetadata = context.Compilation.GetTypeByMetadataName("TestTools.Structure.TemplatedAttribute");
+            var templatedAttributeType = new RuntimeTypeDescription(typeof(AttributeEquivalentAttribute));
 
             var globalNamespace = new CompileTimeNamespaceDescription(context.Compilation.GlobalNamespace);
             var sourceNamespace = globalNamespace.GetNamespace("Lecture_2_Solutions");
@@ -42,16 +42,15 @@ namespace TestTools.Templates
                 StructureVerifier = new VerifierService()
             };
             var rewriter = new TypeRewriter(service, context.Compilation);
-
+            
             foreach (var node in syntaxReceiver.CandidateSyntax)
             {
                 var model = context.Compilation.GetSemanticModel(node.SyntaxTree);
-                var symbol = model.GetDeclaredSymbol(node, context.CancellationToken) as ITypeSymbol;
-                var @namespace = symbol.ContainingNamespace;
+                var symbol = (ITypeSymbol)model.GetDeclaredSymbol(node, context.CancellationToken);
+                var typeDescription = new CompileTimeTypeDescription(symbol);
+                var attributeOfAttributes = typeDescription.GetCustomAttributeTypes().SelectMany(t => t.GetCustomAttributeTypes());
 
-                var attributeData = symbol?.GetAttributes().FirstOrDefault(x => x.AttributeClass.BaseType.Equals(attributeMetadata, SymbolEqualityComparer.Default));
-
-                if (attributeData == null)
+                if (!attributeOfAttributes.Contains(templatedAttributeType))
                     continue;
 
                 var fileName = $"{symbol?.ToDisplayString()}.g.cs";

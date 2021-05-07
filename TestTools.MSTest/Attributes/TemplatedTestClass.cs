@@ -6,11 +6,8 @@ using TestTools.Templates;
 
 namespace TestTools.MSTest
 {
-    public class TemplatedTestClass : TemplatedAttribute
+    [AttributeEquivalent("Microsoft.VisualStudio.TestTools.UnitTesting.TestClass")]
+    public class TemplatedTestClass : Attribute
     {
-        public override string MakeConcrete()
-        {
-            return "[TestClass]";
-        }
     }
 }

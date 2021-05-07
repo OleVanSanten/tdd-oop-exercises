@@ -32,7 +32,7 @@ namespace TestTools.TypeSystem
                 if (namespaceSymbol == null)
                     throw new NotImplementedException("Types in global namespaces are not supported");
 
-                return namespaceSymbol.Name;
+                return new CompileTimeNamespaceDescription(namespaceSymbol).Name;
             }
         }
 
