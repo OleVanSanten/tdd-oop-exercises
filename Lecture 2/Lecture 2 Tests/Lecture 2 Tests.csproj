@@ -28,6 +28,7 @@
     <ProjectReference Include="..\..\TestTools\TestTools.csproj"
                       OutputItemType="Analyzer"
                       ReferenceOutputAssembly="false" />
+    <AdditionalFiles Include="TestToolsConfig.xml" UnitTestGenerator_IsConfig="true"/>
   </ItemGroup>
   
   <ItemGroup>
