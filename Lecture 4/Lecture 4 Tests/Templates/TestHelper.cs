@@ -17,7 +17,6 @@ namespace Lecture_4_Tests
             Lecture_4.Program.Main(new string[0]);
         }
 
-        // public static TestFactory Factory { get; } = new TestFactory("Lecture_4_Solutions", "Lecture_4_Solutions");
-        public static TestFactory Factory { get; } = new TestFactory("Lecture_4_Solutions", "Lecture_4");
+        public static TestFactory Factory { get; } = TestFactory.CreateFromConfigurationFile("./../../../TestToolsConfig.xml");
     }
 }

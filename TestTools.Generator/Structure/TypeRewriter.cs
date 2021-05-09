@@ -160,7 +160,15 @@ namespace TestTools.Structure
 
             // Potentially rewritting expression and method name 
             var translatedMethod = (CompileTimeMethodDescription)_structureService.TranslateMember(originalMethod);
-            var newName = SyntaxFactory.IdentifierName(translatedMethod.Name);
+            SimpleNameSyntax newName;
+            if (memberExpression.Name is GenericNameSyntax genericNameSyntax)
+            {
+                var newTypeArguments = SyntaxFactory.SeparatedList(genericNameSyntax.TypeArgumentList.Arguments.Select(Visit).OfType<TypeSyntax>());
+                var newTypeArgumentList= SyntaxFactory.TypeArgumentList(newTypeArguments);
+                newName = SyntaxFactory.GenericName(SyntaxFactory.Identifier(translatedMethod.Name), newTypeArgumentList); 
+            }
+            else newName = SyntaxFactory.IdentifierName(translatedMethod.Name);
+
             var newMemberExpression = (MemberAccessExpressionSyntax)Visit(memberExpression);
             var newExpression = newMemberExpression.WithName(newName);
 

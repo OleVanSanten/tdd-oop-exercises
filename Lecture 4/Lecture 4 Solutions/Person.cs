@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TestTools.Structure.Attributes;
 using TestTools.Syntax;
 
 namespace Lecture_4_Solutions
@@ -17,6 +18,7 @@ namespace Lecture_4_Solutions
             Name = name;
         }
 
+        [ReadonlyProperty]
         public string Name
         {
             get { return _name; }
@@ -82,15 +84,5 @@ namespace Lecture_4_Solutions
             
             return "obese";
         }
-
-        // TestTools Code
-        [PropertySet("Height")]
-        public void SetHeight(double value) => Height = value;
-
-        [PropertySet("Weight")]
-        public void SetWeight(double value) => Weight = value;
-
-        [PropertySet("Age")]
-        public void SetAge(int value) => Age = value;
     }
 }
