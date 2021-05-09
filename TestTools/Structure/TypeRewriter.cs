@@ -61,6 +61,21 @@ namespace TestTools.Structure
             return node.WithIdentifier(newIdentifier).WithMembers(newMembers).WithAttributeLists(newAttributeLists);
         }
 
+        public override SyntaxNode VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
+        {
+            // Only constructors in classes marked with an attritubes that are marked with TemplatedAttribute should be rewritten
+            var type = GetConstructorDescription(node).DeclaringType;
+            var attributesOfAttributes = type.GetCustomAttributeTypes().SelectMany(t => t.GetCustomAttributes());
+            if (!attributesOfAttributes.Any(a => a is AttributeEquivalentAttribute))
+                return node;
+
+            // Potentially rewritting the class name by removing _Templated from it
+            var newClassName = node.Identifier.Text.Replace("_Template", "");
+            var newIdentifier = SyntaxFactory.IdentifierName(newClassName).Identifier;
+
+            return node.WithIdentifier(newIdentifier);
+        }
+
         public override SyntaxNode VisitAttribute(AttributeSyntax node)
         {
             var templatedAttribute = GetTemplatedAttribute(node);
@@ -250,7 +265,15 @@ namespace TestTools.Structure
 
             return new CompileTimeConstructorDescription(methodSymbol);
         }
-        
+
+        MethodDescription GetConstructorDescription(ConstructorDeclarationSyntax node)
+        {
+            var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
+            var methodSymbol = semanticModel.GetDeclaredSymbol(node);
+
+            return new CompileTimeMethodDescription(methodSymbol);
+        }
+
         MemberDescription GetFieldOrPropertyDescription(MemberAccessExpressionSyntax node)
         {
             
