@@ -25,7 +25,7 @@
 
   <!-- Adds TestTools as source generator -->
   <ItemGroup>
-    <ProjectReference Include="..\..\TestTools\TestTools.csproj"
+    <ProjectReference Include="..\..\TestTools.Generator\TestTools.Generator.csproj"
                       OutputItemType="Analyzer"
                       ReferenceOutputAssembly="false" />
     <AdditionalFiles Include="TestToolsConfig.xml" UnitTestGenerator_IsConfig="true"/>

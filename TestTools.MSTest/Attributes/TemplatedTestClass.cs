@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using TestTools.Structure;
-using TestTools.Templates;
 
 namespace TestTools.MSTest
 {
