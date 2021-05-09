@@ -18,6 +18,6 @@ namespace Lecture_2_Tests
 
 
         // public static TestFactory Factory { get; } = new TestFactory("Lecture_2_Solutions", "Lecture_2_Solutions");
-        public static TestFactory Factory { get; } = new TestFactory("Lecture_2_Solutions", "Lecture_2");
+        public static TestFactory Factory { get; } = TestFactory.CreateFromConfigurationFile("./../../../TestToolsConfig.xml");
     }
 }

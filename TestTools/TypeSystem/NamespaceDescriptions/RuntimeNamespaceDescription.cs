@@ -29,13 +29,27 @@ namespace TestTools.TypeSystem
 
         public override NamespaceDescription[] GetNamespaces()
         {
-            var namespaces = GetTypes().Select(t => t.Namespace).Distinct();
-            var subNamespaces = namespaces.Where(t => t.StartsWith(Name));
+            var allTypesInAllSubnamespaces = GetTypes(t => t.Namespace == null || t.Namespace.StartsWith(Name) || string.IsNullOrEmpty(Name)); 
+            var allSubnamespaces = allTypesInAllSubnamespaces.Select(t => t.Namespace).Distinct();
+            var directSubnamespaces = allSubnamespaces.Where(s => CountPeriods(s) + 1 == CountPeriods(Name));
 
-            return namespaces.Select(t => new RuntimeNamespaceDescription(t)).ToArray();
+            return directSubnamespaces.Select(t => new RuntimeNamespaceDescription(t)).ToArray();
+        }
+
+        private int CountPeriods(string str)
+        {
+            if (str == null)
+                return 0;
+
+            return str.Count(c => c == '.');
         }
 
         public override TypeDescription[] GetTypes()
+        {
+            return GetTypes(t => t.Namespace == Name);
+        }
+
+        private TypeDescription[] GetTypes(Func<Type, bool> predicate)
         {
             var output = new List<TypeDescription>();
 
@@ -48,7 +62,7 @@ namespace TestTools.TypeSystem
                 try
                 {
                     var assembly = assemblyEnumerator.Current;
-                    var typesInNamespace = assembly.GetTypes().Where(t => t.Namespace == Name);
+                    var typesInNamespace = assembly.GetTypes().Where(predicate);
                     var typeDescriptions = typesInNamespace.Select(t => new RuntimeTypeDescription(t));
                     output.AddRange(typeDescriptions);
                 }

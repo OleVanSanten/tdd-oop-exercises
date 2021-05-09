@@ -14,11 +14,20 @@ namespace TestTools.TypeSystem
 
         public virtual NamespaceDescription GetNamespace(string name)
         {
-            // Handling global namespace
-            if (string.IsNullOrEmpty(Name))
-                return GetNamespaces().First(n => n.Name == name);
+            // Creating predicate for either non-global pattern ("*.Name") or global pattern ("Name")
+            Func<NamespaceDescription, bool> predicate;
+            if (!string.IsNullOrEmpty(Name))
+                predicate = n => n.Name == $"{Name}.{name}";
+            else predicate = n => n.Name == name;
 
-            return GetNamespaces().First(n => n.Name == $"{Name}.{name}");
+            // Trying to matching namespace
+            var @namespace = GetNamespaces().FirstOrDefault(predicate);
+            if (@namespace == null)
+            {
+                string ownNameWithPrefix = !string.IsNullOrEmpty(Name) ? Name + "." : "global::";
+                throw new ArgumentException($"Namespace {ownNameWithPrefix}{name} could not be found");
+            }
+            return @namespace;
         }
 
         public abstract NamespaceDescription[] GetNamespaces();
