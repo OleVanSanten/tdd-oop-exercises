@@ -10,6 +10,9 @@ namespace TestTools.TypeSystem
     {
         public RuntimeNamespaceDescription(string @namespace)
         {
+            if (string.IsNullOrEmpty(@namespace))
+                throw new ArgumentException("Global namespaces are not supported");
+
             Name = @namespace;
         }
 

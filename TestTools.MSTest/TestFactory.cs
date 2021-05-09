@@ -59,9 +59,8 @@ namespace TestTools.MSTest
 
         private static IStructureService ConfigureStructureService(XMLConfiguration config)
         {
-            var globalNamespace = new RuntimeNamespaceDescription("");
-            var fromNamespace = config.GetFromNamespace(globalNamespace);
-            var toNamespace = config.GetToNamespace(globalNamespace);
+            var fromNamespace = new RuntimeNamespaceDescription(config.GetFromNamespaceName());
+            var toNamespace = new RuntimeNamespaceDescription(config.GetToNamespaceName());
 
             var typeTranslator = config.GetTypeTranslator();
             var memberTranslator = config.GetMemberTranslator();

@@ -18,25 +18,44 @@ namespace TestTools
             root = XElement.Parse(xml);
         }
 
-        public NamespaceDescription GetFromNamespace(NamespaceDescription globalNamespace)
+        public string GetFromNamespaceName()
         {
             var fromNamespaceElement = root.Element("FromNamespace");
 
             if (fromNamespaceElement == null)
                 return null;
 
-            var fromNamespaceName = fromNamespaceElement.Value;
+            return fromNamespaceElement.Value;
+        }
+
+        public NamespaceDescription GetFromNamespace(NamespaceDescription globalNamespace)
+        {
+            var fromNamespaceName = GetFromNamespaceName();
+
+            if (fromNamespaceName == null)
+                return null;
+
             return GetNamespace(globalNamespace, fromNamespaceName);
         }
 
-        public NamespaceDescription GetToNamespace(NamespaceDescription globalNamespace)
+        public string GetToNamespaceName()
         {
             var toNamespaceElement = root.Element("ToNamespace");
 
             if (toNamespaceElement == null)
                 return null;
 
-            return GetNamespace(globalNamespace, toNamespaceElement.Value);
+            return toNamespaceElement.Value;
+        }
+
+        public NamespaceDescription GetToNamespace(NamespaceDescription globalNamespace)
+        {
+            var toNamespace = GetToNamespaceName();
+
+            if (toNamespace == null)
+                return null;
+
+            return GetNamespace(globalNamespace, toNamespace);
         }
 
         public ITypeTranslator GetTypeTranslator()
