@@ -2,9 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>Lecture_1_Tests</RootNamespace>
+    <RootNamespace>Lecture_3_Tests</RootNamespace>
 
     <IsPackable>false</IsPackable>
+    <UseNETCoreGenerator>true</UseNETCoreGenerator>
+    <IncludeBuildOutput>true</IncludeBuildOutput>
+
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\GeneratedFiles</CompilerGeneratedFilesOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,6 +20,14 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <!-- Adds TestTools.Generator as source generator -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\TestTools.Generator\TestTools.Generator.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
+    <AdditionalFiles Include="TestToolsConfig.xml" UnitTestGenerator_IsConfig="true"/>
   </ItemGroup>
 
   <ItemGroup>

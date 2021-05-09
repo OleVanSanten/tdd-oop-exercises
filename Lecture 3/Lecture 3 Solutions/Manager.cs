@@ -32,9 +32,5 @@ namespace Lecture_3_Solutions
         {
             return $"Manager {Name} ({Title})";
         }
-
-        // TestTools Code
-        [PropertySet("Bonus")]
-        public void SetBonus(decimal value) => Bonus = value; 
     }
 }

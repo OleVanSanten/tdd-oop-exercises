@@ -9,7 +9,7 @@ using static TestTools.Expressions.TestExpression;
 namespace Lecture_3_Tests
 {
     [TestClass]
-    public class Exercise_6_Tests
+    public class Exercise_6_Tests_Template
     {
         private string ProduceExpectedPrintDirectoryOutput(DirectoryInfo info)
         {
@@ -59,7 +59,7 @@ namespace Lecture_3_Tests
         }
 
         #region Exercise 6A
-        [TestMethod("FileExplorer.PrintDirectory(DirectoryInfo info) prints correct output"), TestCategory("Exercise 6A")]
+        [TemplatedTestMethod("FileExplorer.PrintDirectory(DirectoryInfo info) prints correct output"), TestCategory("Exercise 6A")]
         public void FileExplorerPrintDirectoryPrintsCorrectOutput()
         {
             DirectoryInfo directoryInfo = new DirectoryInfo("../../../directory/");
@@ -67,20 +67,11 @@ namespace Lecture_3_Tests
 
             string expectedOutput = ProduceExpectedPrintDirectoryOutput(directoryInfo);
             ConsoleAssert.WritesOut(() => explorer.PrintDirectory(directoryInfo), expectedOutput);
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<FileExplorer> _explorer = test.CreateVariable<FileExplorer>();
-            test.Arrange(_explorer, Expr(() => new FileExplorer()));
-            test.ConsoleAssert.WritesOut(
-                Lambda(Expr(_explorer, e => e.PrintDirectory(directoryInfo))), 
-                Const(expectedOutput));
-            test.Execute();
         }
         #endregion
 
         #region Exercise 6B
-        [TestMethod("FileExplorer.PrintTree(DirectoryInfo info) prints correct output"), TestCategory("Exercise 6B")]
+        [TemplatedTestMethod("FileExplorer.PrintTree(DirectoryInfo info) prints correct output"), TestCategory("Exercise 6B")]
         public void FileExplorerPrintTreePrintsCorrectOutput()
         {
             DirectoryInfo directoryInfo = new DirectoryInfo("../../../directory/");
@@ -88,15 +79,6 @@ namespace Lecture_3_Tests
 
             string expectedOutput = ProduceExpectedPrintTreeOutput(directoryInfo, 0);
             ConsoleAssert.WritesOut(() => explorer.PrintTree(directoryInfo), expectedOutput);
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<FileExplorer> _explorer = test.CreateVariable<FileExplorer>();
-            test.Arrange(_explorer, Expr(() => new FileExplorer()));
-            test.ConsoleAssert.WritesOut(
-                Lambda(Expr(_explorer, e => e.PrintTree(directoryInfo))),
-                Const(expectedOutput));
-            test.Execute();
         }
         #endregion
     }
