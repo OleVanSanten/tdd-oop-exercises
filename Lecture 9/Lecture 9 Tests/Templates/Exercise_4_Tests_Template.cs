@@ -10,8 +10,8 @@ using static TestTools.Expressions.TestExpression;
 
 namespace Lecture_9_Tests
 {
-    [TestClass]
-    public class Exercise_4_Tests
+    [TemplatedTestClass]
+    public class Exercise_4_Tests_Template
     {
         #region Exercise 4A
         [TestMethod("a. ObservableCollection<T> implements ICollection<T>"), TestCategory("Exercise 4A")]
@@ -34,7 +34,7 @@ namespace Lecture_9_Tests
             test.Execute();
         }
 
-        [TestMethod("b. ObservableCollection<T>.Add(T elem) emits CollectionChanged event"), TestCategory("Exercise 4B")]
+        [TemplatedTestMethod("b. ObservableCollection<T>.Add(T elem) emits CollectionChanged event"), TestCategory("Exercise 4B")]
         public void ObservableCollectionAddEmitsCollectionChangedEvents()
         {
             bool isCalled = false;
@@ -44,17 +44,9 @@ namespace Lecture_9_Tests
             collection.Add(5);
 
             Assert.IsTrue(isCalled, "The ObservableCollection<T>.CollectionChanged event is never emitted");
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<ObservableCollection<int>> _collection = test.CreateVariable<ObservableCollection<int>>();
-            test.Arrange(_collection, Expr(() => new ObservableCollection<int>()));
-            test.DelegateAssert.IsInvoked(Lambda<NotifyCollectionChangedEventHandler>(handler => Expr(_collection, c => c.AddCollectionChanged(handler))));
-            test.Act(Expr(_collection, c => c.Add(5)));
-            test.Execute();
         }
 
-        [TestMethod("c. ObservableCollection<T>.Clear() emits CollectionChanged event"), TestCategory("Exercise 4B")]
+        [TemplatedTestMethod("c. ObservableCollection<T>.Clear() emits CollectionChanged event"), TestCategory("Exercise 4B")]
         public void ObservableCollectionClearEmitsCollectionChangedEvent()
         {
             bool isCalled = false;
@@ -64,17 +56,9 @@ namespace Lecture_9_Tests
             collection.Clear();
 
             Assert.IsTrue(isCalled, "The ObservableCollection<T>.CollectionChanged event is never emitted");
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<ObservableCollection<int>> _collection = test.CreateVariable<ObservableCollection<int>>();
-            test.Arrange(_collection, Expr(() => new ObservableCollection<int>() { 1 }));
-            test.DelegateAssert.IsInvoked(Lambda<NotifyCollectionChangedEventHandler>(handler => Expr(_collection, c => c.AddCollectionChanged(handler))));
-            test.Act(Expr(_collection, c => c.Clear()));// TestTools Code
-            test.Execute();
         }
 
-        [TestMethod("d. ObservableCollection<T>.Remove(T elem) emits CollectionChanged event"), TestCategory("Exercise 4B")]
+        [TemplatedTestMethod("d. ObservableCollection<T>.Remove(T elem) emits CollectionChanged event"), TestCategory("Exercise 4B")]
         public void ObservableCollectionRemoveEmitsCollectionChangedEvent()
         {
             bool isCalled = false;
@@ -84,14 +68,6 @@ namespace Lecture_9_Tests
             collection.Remove(1);
 
             Assert.IsTrue(isCalled, "The ObservableCollection<T>.CollectionChanged event is never emitted");
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<ObservableCollection<int>> _collection = test.CreateVariable<ObservableCollection<int>>();
-            test.Arrange(_collection, Expr(() => new ObservableCollection<int>() { 1 }));
-            test.DelegateAssert.IsInvoked(Lambda<NotifyCollectionChangedEventHandler>(handler => Expr(_collection, c => c.AddCollectionChanged(handler))));
-            test.Act(Expr(_collection, c => c.Remove(1)));
-            test.Execute();
         }
         #endregion
     }

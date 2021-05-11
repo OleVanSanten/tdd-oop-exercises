@@ -55,9 +55,5 @@ namespace Lecture_9_Solutions
         {
             return GetEnumerator();
         }
-
-        // TestTools Code
-        [EventAdd("CollectionChanged")]
-        public void AddCollectionChanged(NotifyCollectionChangedEventHandler handler) => CollectionChanged += handler;
     }
 }

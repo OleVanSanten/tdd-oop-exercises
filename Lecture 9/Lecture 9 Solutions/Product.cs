@@ -27,9 +27,5 @@ namespace Lecture_9_Solutions
         {
             return ID;
         }
-
-        // TestTools Code
-        [PropertySet("Name")]
-        public void SetName(string value) => Name = value; 
     }
 }
