@@ -9,8 +9,8 @@ using static TestTools.Expressions.TestExpression;
 
 namespace Lecture_8_Tests
 {
-    [TestClass]
-    public class Exercise_2_Tests
+    [TemplatedTestClass]
+    public class Exercise_2_Tests_Template
     {
         #region Exercise 2A
         [TestMethod("a. BankAccount.Balance is a public read-only Balance"), TestCategory("Exercise 2A")]
@@ -22,18 +22,11 @@ namespace Lecture_8_Tests
             test.Execute();
         }
 
-        [TestMethod("b. BankAccount.Balance is initialized as 0M"), TestCategory("Exercise 2A")]
+        [TemplatedTestMethod("b. BankAccount.Balance is initialized as 0M"), TestCategory("Exercise 2A")]
         public void BankBalanceIsInitializedAs0M()
         {
             BankAccount account = new BankAccount();
             Assert.AreEqual(account.Balance, 0M);
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<BankAccount> _account = test.CreateVariable<BankAccount>();
-            test.Arrange(_account, Expr(() => new BankAccount()));
-            test.Assert.AreEqual(Expr(_account, a => a.Balance), Const(0M));
-            test.Execute();
         }
         #endregion
 
@@ -56,7 +49,7 @@ namespace Lecture_8_Tests
             test.Execute();
         }
 
-        [TestMethod("c. BankAccount.LowBalanceThreshold assigned above HighBalanceThreshold throws ArgumentException"), TestCategory("Exercise 2B")]
+        [TemplatedTestMethod("c. BankAccount.LowBalanceThreshold assigned above HighBalanceThreshold throws ArgumentException"), TestCategory("Exercise 2B")]
         public void BankAccountLowBalanceThresholdBelowHighBalanceThresholdThrowsArgumentException()
         {
             BankAccount account = new BankAccount()
@@ -64,16 +57,9 @@ namespace Lecture_8_Tests
                 HighBalanceThreshold = 0
             };
             Assert.ThrowsException<ArgumentException>(() => account.LowBalanceThreshold = 1M);
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<BankAccount> _account = test.CreateVariable<BankAccount>();
-            test.Arrange(_account, Expr(() => new BankAccount() { HighBalanceThreshold = 0 }));
-            test.Assert.ThrowsExceptionOn<ArgumentException>(Expr(_account, a => a.SetLowBalanceThreshold(1M)));
-            test.Execute();
         }
 
-        [TestMethod("d. BankAccount.HighBalanceThreshold assigned below LowBalanceThreshold throws ArgumentException"), TestCategory("Exercise 2B")]
+        [TemplatedTestMethod("d. BankAccount.HighBalanceThreshold assigned below LowBalanceThreshold throws ArgumentException"), TestCategory("Exercise 2B")]
         public void BankAccountHighBalanceThresholdBelowLowBalanceThresholdThrowsArgumentException()
         {
             BankAccount account = new BankAccount()
@@ -81,13 +67,6 @@ namespace Lecture_8_Tests
                 LowBalanceThreshold = 0
             };
             Assert.ThrowsException<ArgumentException>(() => account.HighBalanceThreshold = -1M);
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<BankAccount> _account = test.CreateVariable<BankAccount>();
-            test.Arrange(_account, Expr(() => new BankAccount() { LowBalanceThreshold = 0 }));
-            test.Assert.ThrowsExceptionOn<ArgumentException>(Expr(_account, a => a.SetHighBalanceThreshold(-1M)));
-            test.Execute();
         }
         #endregion
 
@@ -110,7 +89,7 @@ namespace Lecture_8_Tests
             test.Execute();
         }
 
-        [TestMethod("c. BankAccount.Deposit(50) adds 50 to Balance"), TestCategory("Exercise 2C")]
+        [TemplatedTestMethod("c. BankAccount.Deposit(50) adds 50 to Balance"), TestCategory("Exercise 2C")]
         public void BankAccountDepositAddsToBalance()
         {
             BankAccount account = new BankAccount();
@@ -118,17 +97,9 @@ namespace Lecture_8_Tests
             account.Deposit(50M);
 
             Assert.AreEqual(50M, account.Balance);
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<BankAccount> _account = test.CreateVariable<BankAccount>();
-            test.Arrange(_account, Expr(() => new BankAccount()));
-            test.Act(Expr(_account, a => a.Deposit(50M)));
-            test.Assert.AreEqual(Const(50M), Expr(_account, a => a.Balance));
-            test.Execute();
         }
 
-        [TestMethod("d. BankAccount.Withdraw(50) takes 50 from Balance"), TestCategory("Exercise 2C")]
+        [TemplatedTestMethod("d. BankAccount.Withdraw(50) takes 50 from Balance"), TestCategory("Exercise 2C")]
         public void BankAccountWithdrawTakesFromBalance()
         {
             BankAccount account = new BankAccount();
@@ -136,14 +107,6 @@ namespace Lecture_8_Tests
             account.Withdraw(50M);
 
             Assert.AreEqual(-50M, account.Balance);
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<BankAccount> _account = test.CreateVariable<BankAccount>();
-            test.Arrange(_account, Expr(() => new BankAccount()));
-            test.Act(Expr(_account, a => a.Withdraw(50M)));
-            test.Assert.AreEqual(Const(-50M), Expr(_account, a => a.Balance));
-            test.Execute();
         }
         #endregion
 
@@ -183,7 +146,7 @@ namespace Lecture_8_Tests
             test.Execute();
         }
 
-        [TestMethod("c. BankAccount.Withdraw(decimal amount) emits LowBalance event if Balance goes below threshold"), TestCategory("Exercise 2E")]
+        [TemplatedTestMethod("c. BankAccount.Withdraw(decimal amount) emits LowBalance event if Balance goes below threshold"), TestCategory("Exercise 2E")]
         public void BankAccountWithdrawEmitsLowBalance()
         {
             bool isCalled = false;
@@ -196,17 +159,9 @@ namespace Lecture_8_Tests
             account.Withdraw(50);
 
             Assert.IsTrue(isCalled, "The BankAccout.LowBalance event was never emitted");
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<BankAccount> _account = test.CreateVariable<BankAccount>();
-            test.Arrange(_account, Expr(() => new BankAccount() { LowBalanceThreshold = 0 }));
-            test.DelegateAssert.IsInvoked(Lambda<BalanceChangeHandler>(handler => Expr(_account, a => a.AddLowBalance(handler))));
-            test.Act(Expr(_account, a => a.Withdraw(50M)));
-            test.Execute();
         }
 
-        [TestMethod("d. BankAccount.Deposit(decimal amount) emits HighBalance event if Balance goes below threshold"), TestCategory("Exercise 2E")]
+        [TemplatedTestMethod("d. BankAccount.Deposit(decimal amount) emits HighBalance event if Balance goes below threshold"), TestCategory("Exercise 2E")]
         public void BankAccountDepositEmitsHighBalance()
         {
             // MSTest Extended
@@ -220,14 +175,6 @@ namespace Lecture_8_Tests
             account.Deposit(50);
 
             Assert.IsTrue(isCalled, "The BankAccout.HighBalance event was never emitted");
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<BankAccount> _account = test.CreateVariable<BankAccount>();
-            test.Arrange(_account, Expr(() => new BankAccount() { HighBalanceThreshold = 0 }));
-            test.DelegateAssert.IsInvoked(Lambda<BalanceChangeHandler>(handler => Expr(_account, a => a.AddHighBalance(handler))));
-            test.Act(Expr(_account, a => a.Deposit(50)));
-            test.Execute();
         }
         #endregion
     }

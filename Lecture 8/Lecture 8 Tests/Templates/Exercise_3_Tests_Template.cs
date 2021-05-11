@@ -13,8 +13,8 @@ using static TestTools.Helpers.StructureHelper;
 
 namespace Lecture_8_Tests
 {
-    [TestClass]
-    public class Exercise_3_Tests
+    [TemplatedTestClass]
+    public class Exercise_3_Tests_Template
     {
         #region Exercise 3A
         [TestMethod("a. ConsoleView.Run() is a public method"), TestCategory("Exercise 3A")]
@@ -26,7 +26,7 @@ namespace Lecture_8_Tests
             test.Execute();
         }
 
-        [TestMethod("b. ConsoleView.Run() returns on empty line input"), TestCategory("Exercise 3A")]
+        [TemplatedTestMethod("b. ConsoleView.Run() returns on empty line input"), TestCategory("Exercise 3A")]
         public void ConsoleViewRunReturnsOnEmptyLineInput()
         {
             // MSTest Extended
@@ -35,15 +35,6 @@ namespace Lecture_8_Tests
             ConsoleInputter.Clear();
             ConsoleInputter.WriteLine();
             view.Run();
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<ConsoleView> _view = test.CreateVariable<ConsoleView>();
-            test.Arrange(_view, Expr(() => new ConsoleView()));
-            test.Act(Expr(() => ConsoleInputter.Clear()));
-            test.Act(Expr(() => ConsoleInputter.WriteLine()));
-            test.Act(Expr(_view, v => v.Run()));
-            test.Execute();
         }
         #endregion
 
@@ -71,7 +62,7 @@ namespace Lecture_8_Tests
             test.Execute();
         }
 
-        [TestMethod("b. ConsoleView.Run emits Input on non-empty-line input"), TestCategory("Exercise 3C")]
+        [TemplatedTestMethod("b. ConsoleView.Run emits Input on non-empty-line input"), TestCategory("Exercise 3C")]
         public void ConsoleViewRunEmitsInputOnNonEmptyLineInput()
         {
             bool isCalled = false;
@@ -84,20 +75,9 @@ namespace Lecture_8_Tests
             view.Run();
 
             Assert.IsTrue(isCalled, "The ConsoleView.Run event was never emitted");
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<ConsoleView> _view = test.CreateVariable<ConsoleView>();
-            test.Arrange(_view, Expr(() => new ConsoleView()));
-            test.DelegateAssert.IsInvoked(Lambda<InputHandler>(handler => Expr(_view, v => v.AddInput(handler))));
-            test.Act(Expr(() => ConsoleInputter.Clear()));
-            test.Act(Expr(() => ConsoleInputter.WriteLine("User input")));
-            test.Act(Expr(() => ConsoleInputter.WriteLine()));
-            test.Act(Expr(_view, v => v.Run()));
-            test.Execute();
         }
 
-        [TestMethod("c. ConsoleView.Run does not emit Input on empty-line input"), TestCategory("Exercise 3C")]
+        [TemplatedTestMethod("c. ConsoleView.Run does not emit Input on empty-line input"), TestCategory("Exercise 3C")]
         public void ConsoleViewRunDoesNotEmitInputOnEmptyLineInput()
         {
             bool isCalled = false;
@@ -109,16 +89,6 @@ namespace Lecture_8_Tests
             view.Run();
 
             Assert.IsFalse(isCalled, "The ConsoleView.Run event was emitted");
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<ConsoleView> _view = test.CreateVariable<ConsoleView>();
-            test.Arrange(_view, Expr(() => new ConsoleView()));
-            test.DelegateAssert.IsNotInvoked(Lambda<InputHandler>(handler => Expr(_view, v => v.AddInput(handler))));
-            test.Act(Expr(() => ConsoleInputter.Clear()));
-            test.Act(Expr(() => ConsoleInputter.WriteLine()));
-            test.Act(Expr(_view, v => v.Run()));
-            test.Execute();
         }
         #endregion
     }

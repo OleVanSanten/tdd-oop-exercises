@@ -23,9 +23,5 @@ namespace Lecture_8_Solutions
                 else Input?.Invoke(line);
             }
         }
-
-        // TestTools Code
-        [EventAdd("Input")]
-        public void AddInput(InputHandler handler) => Input += handler;
     }
 }
