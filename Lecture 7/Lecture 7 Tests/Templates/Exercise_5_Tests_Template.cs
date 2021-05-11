@@ -10,8 +10,8 @@ using static TestTools.Expressions.TestExpression;
 
 namespace Lecture_7_Tests
 {
-    [TestClass]
-    public class Exercise_5_Tests
+    [TemplatedTestClass]
+    public class Exercise_5_Tests_Template
     {
         #region Exercise 5A
         [TestMethod("a. ArrayHelper is a public static class"), TestCategory("Exercise 5A")]
@@ -38,18 +38,11 @@ namespace Lecture_7_Tests
             test.Execute();
         }
 
-        [TestMethod("b. ArrayHelper.Min<T>(T[] array) returns the smallest object"), TestCategory("Exercise 5B")]
+        [TemplatedTestMethod("b. ArrayHelper.Min<T>(T[] array) returns the smallest object"), TestCategory("Exercise 5B")]
         public void ArrayHelperMinReturnsTheSmallestObject()
         {
             int[] array = new int[] { 2, 5, 3 };
             Assert.AreEqual(2, ArrayHelper.Min(array));
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<int[]> _array = test.CreateVariable<int[]>();
-            test.Arrange(_array, Expr(() => new[] { 2, 5, 3 }));
-            test.Assert.AreEqual(Const(2), Expr(_array, a => ArrayHelper.Min(a)));
-            test.Execute();
         }
         #endregion
 
@@ -65,18 +58,11 @@ namespace Lecture_7_Tests
             test.Execute();
         }
 
-        [TestMethod("b. ArrayHelper.Max<T>(T[] array) returns the largest object"), TestCategory("Exercise 5C")]
+        [TemplatedTestMethod("b. ArrayHelper.Max<T>(T[] array) returns the largest object"), TestCategory("Exercise 5C")]
         public void ArrayHelperMinReturnsTheLargestObject()
         {
             int[] array = new int[] { 2, 5, 3 };
             Assert.AreEqual(5, ArrayHelper.Max(array));
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<int[]> _array = test.CreateVariable<int[]>();
-            test.Arrange(_array, Expr(() => new[] { 2, 5, 3 }));
-            test.Assert.AreEqual(Const(5), Expr(_array, a => ArrayHelper.Max(a)));
-            test.Execute();
         }
         #endregion
 
@@ -92,19 +78,12 @@ namespace Lecture_7_Tests
             test.Execute();
         }
 
-        [TestMethod("b. ArrayHelper.Copy<T>(T[] array) returns a copy of the array"), TestCategory("Exercise 5D")]
+        [TemplatedTestMethod("b. ArrayHelper.Copy<T>(T[] array) returns a copy of the array"), TestCategory("Exercise 5D")]
         public void ArrayHelperCopyReturnsACopyOfTheArray()
         {
             int[] array = new int[] { 2, 5, 3, 8, 9 };
 
             CollectionAssert.AreEqual(array, ArrayHelper.Copy(array));
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<int[]> _array = test.CreateVariable<int[]>();
-            test.Arrange(_array, Expr(() => new[] { 2, 5, 3, 8, 9 }));
-            test.CollectionAssert.AreEqual(Expr(_array, a => (ICollection)a), Expr(_array, a => (ICollection)ArrayHelper.Copy(a)));
-            test.Execute();
         }
         #endregion
 
@@ -120,7 +99,7 @@ namespace Lecture_7_Tests
             test.Execute();
         }
 
-        [TestMethod("b. ArrayHelper.Shuffle<T>(T[] array) swaps elements in original array (may fail)"), TestCategory("Exercise 5E")]
+        [TemplatedTestMethod("b. ArrayHelper.Shuffle<T>(T[] array) swaps elements in original array (may fail)"), TestCategory("Exercise 5E")]
         public void ArrayHelperShuffleSwapsElementsInOriginalArray()
         {
             int[] expected = new int[] { 1, 2, 3, 4, 5 };
@@ -129,16 +108,6 @@ namespace Lecture_7_Tests
             ArrayHelper.Shuffle(actual);
 
             CollectionAssert.AreNotEqual(expected, actual);
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<int[]> _expected = test.CreateVariable<int[]>();
-            TestVariable<int[]> _actual = test.CreateVariable<int[]>();
-            test.Arrange(_expected, Expr(() => new[] { 1, 2, 3, 4, 5 }));
-            test.Arrange(_actual, Expr(() => new[] { 1, 2, 3, 4, 5 }));
-            test.Act(Expr(_actual, a => ArrayHelper.Shuffle(a)));
-            test.CollectionAssert.AreNotEqual(Expr(_expected, e => (ICollection)e), Expr(_actual, a => (ICollection)a));
-            test.Execute();
         }
         #endregion
     }

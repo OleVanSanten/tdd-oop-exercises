@@ -9,8 +9,8 @@ using static TestTools.Expressions.TestExpression;
 
 namespace Lecture_7_Tests
 {
-    [TestClass]
-    public class Exercise_1_Tests
+    [TemplatedTestClass]
+    public class Exercise_1_Tests_Template
     {
         #region Exercise 1A
         [TestMethod("a. Pair<T1, T2>.Fst is public read-only T1 property"), TestCategory("Exercise 1A")]
@@ -45,32 +45,18 @@ namespace Lecture_7_Tests
             test.Execute();
         }
 
-        [TestMethod("b. Pair<T1, T2> constructor sets Fst"), TestCategory("Exercise 1B")]
+        [TemplatedTestMethod("b. Pair<T1, T2> constructor sets Fst"), TestCategory("Exercise 1B")]
         public void PairConstructorSetsFst()
         {
             Pair<string, int> pair = new Pair<string, int>("abc", 5);
             Assert.AreEqual("abc", pair.Fst);
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<Pair<string, int>> _pair = test.CreateVariable<Pair<string, int>>();
-            test.Arrange(_pair, Expr(() => new Pair<string, int>("abc", 5)));
-            test.Assert.AreEqual(Const("abc"), Expr(_pair, p => p.Fst));
-            test.Execute();
         }
 
-        [TestMethod("c. Pair<T1, T2> constructor sets Snd"), TestCategory("Exercise 1B")]
+        [TemplatedTestMethod("c. Pair<T1, T2> constructor sets Snd"), TestCategory("Exercise 1B")]
         public void PairConstructorSetsSnd()
         {
             Pair<string, int> pair = new Pair<string, int>("abc", 5);
             Assert.AreEqual(5, pair.Snd);
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<Pair<string, int>> _pair = test.CreateVariable<Pair<string, int>>();
-            test.Arrange(_pair, Expr(() => new Pair<string, int>("abc", 5)));
-            test.Assert.AreEqual(Const(5), Expr(_pair, p => p.Snd));
-            test.Execute();
         }
         #endregion
 
@@ -85,7 +71,7 @@ namespace Lecture_7_Tests
             test.Execute();
         }
         
-        [TestMethod("b. Pair<T1, T2>.Swap() switches Fst and Snd values around"), TestCategory("Exercise 1C")]
+        [TemplatedTestMethod("b. Pair<T1, T2>.Swap() switches Fst and Snd values around"), TestCategory("Exercise 1C")]
         public void PairSwapSwitchesFstAndSnd()
         {
             Pair<string, int> pair1 = new Pair<string, int>("abc", 5);
@@ -94,16 +80,6 @@ namespace Lecture_7_Tests
 
             Assert.AreEqual(5, pair2.Fst);
             Assert.AreEqual("abc", pair2.Snd);
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<Pair<string, int>> _pair1 = test.CreateVariable<Pair<string, int>>();
-            TestVariable<Pair<int, string>> _pair2 = test.CreateVariable<Pair<int, string>>();
-            test.Arrange(_pair1, Expr(() => new Pair<string, int>("abc", 5)));
-            test.Arrange(_pair2, Expr(_pair1, p => p.Swap()));
-            test.Assert.AreEqual(Const(5), Expr(_pair2, p => p.Fst));
-            test.Assert.AreEqual(Const("abc"), Expr(_pair2, p => p.Snd));
-            test.Execute();
         }
         #endregion
 
@@ -128,7 +104,7 @@ namespace Lecture_7_Tests
             test.Execute();
         }
 
-        [TestMethod("c. Pair<T1, T2>.SetFst<C>(C value) returns new Pair with Fst = value"), TestCategory("Exercise 1D")]
+        [TemplatedTestMethod("c. Pair<T1, T2>.SetFst<C>(C value) returns new Pair with Fst = value"), TestCategory("Exercise 1D")]
         public void PairSetFstReturnsNewPair()
         {
             Pair<string, int> pair1 = new Pair<string, int>("abc", 5);
@@ -137,19 +113,9 @@ namespace Lecture_7_Tests
 
             Assert.AreEqual(7.0, pair2.Fst);
             Assert.AreEqual(5, pair2.Snd);
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<Pair<string, int>> _pair1 = test.CreateVariable<Pair<string, int>>();
-            TestVariable<Pair<double, int>> _pair2 = test.CreateVariable<Pair<double, int>>();
-            test.Arrange(_pair1, Expr(() => new Pair<string, int>("abc", 5)));
-            test.Arrange(_pair2, Expr(_pair1, p => p.SetFst(7.0)));
-            test.Assert.AreEqual(Const(7.0), Expr(_pair2, p => p.Fst));
-            test.Assert.AreEqual(Const(5), Expr(_pair2, p => p.Snd));
-            test.Execute();
         }
 
-        [TestMethod("c. Pair<T1, T2>.SetSnd<C>(C value) returns new Pair with Snd = value"), TestCategory("Exercise 1D")]
+        [TemplatedTestMethod("c. Pair<T1, T2>.SetSnd<C>(C value) returns new Pair with Snd = value"), TestCategory("Exercise 1D")]
         public void PairSetSndReturnsNewPair()
         {
             Pair<string, int> pair1 = new Pair<string, int>("abc", 5);
@@ -158,16 +124,6 @@ namespace Lecture_7_Tests
 
             Assert.AreEqual("abc", pair2.Fst);
             Assert.AreEqual(7.0, pair2.Snd);
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<Pair<string, int>> _pair1 = test.CreateVariable<Pair<string, int>>();
-            TestVariable<Pair<string, double>> _pair2 = test.CreateVariable<Pair<string, double>>();
-            test.Arrange(_pair1, Expr(() => new Pair<String, int>("abc", 5)));
-            test.Arrange(_pair2, Expr(_pair1, p => p.SetSnd(7.0)));
-            test.Assert.AreEqual(Const("abc"), Expr(_pair2, p => p.Fst));
-            test.Assert.AreEqual(Const(7.0), Expr(_pair2, p => p.Snd));
-            test.Execute();
         }
         #endregion
     }

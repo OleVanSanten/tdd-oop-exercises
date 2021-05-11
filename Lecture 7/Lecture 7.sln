@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestTools", "..\TestTools\T
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestTools.MSTest", "..\TestTools.MSTest\TestTools.MSTest.csproj", "{EF44B410-DE9F-478D-A1E3-950F3AE285FC}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestTools.Generator", "..\TestTools.Generator\TestTools.Generator.csproj", "{9CAF02FE-AD90-4C97-A427-4448538E2F39}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{EF44B410-DE9F-478D-A1E3-950F3AE285FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF44B410-DE9F-478D-A1E3-950F3AE285FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF44B410-DE9F-478D-A1E3-950F3AE285FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CAF02FE-AD90-4C97-A427-4448538E2F39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CAF02FE-AD90-4C97-A427-4448538E2F39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CAF02FE-AD90-4C97-A427-4448538E2F39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CAF02FE-AD90-4C97-A427-4448538E2F39}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
