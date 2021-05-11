@@ -52,15 +52,5 @@ namespace Lecture_6_Solutions
                 return -1;
             else return (int)(other._value - this._value);
         }
-
-        // TestTool Code
-        [PropertySet("Celcius")]
-        public void SetCelcius(double value) => Celcius = value;
-
-        [PropertySet("Fahrenheit")]
-        public void SetFahrenheit(double value) => Fahrenheit = value;
-
-        [PropertySet("Kelvin")]
-        public void SetKelvin(double value) => Kelvin = value;
     }
 }

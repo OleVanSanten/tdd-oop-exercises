@@ -16,9 +16,5 @@ namespace Lecture_6_Solutions
 
             Array.Sort(cars, Comparer);
         }
-
-        // TestTool Code
-        [PropertySet("Comparer")]
-        public void SetComparer(IComparer<Car> value) => Comparer = value;
     }
 }

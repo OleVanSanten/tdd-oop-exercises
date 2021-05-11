@@ -14,8 +14,8 @@ using System.IO.Abstractions;
 
 namespace Lecture_6_Tests
 {
-    [TestClass]
-    public class Exercise_7_Tests 
+    [TemplatedTestClass]
+    public class Exercise_7_Tests_Template
     {
         #region Exercise 7A
         [TestMethod("a. TextFile constructor takes string"), TestCategory("Exercise 7A")]
@@ -44,7 +44,7 @@ namespace Lecture_6_Tests
             fs.File.WriteAllText("./file.txt", "content of file");
         }
 
-        [TestMethod("b. TestFile.Content reads file content correctly"), TestCategory("Exercise 7B")]
+        [TemplatedTestMethod("b. TestFile.Content reads file content correctly"), TestCategory("Exercise 7B")]
         public void TestFileContentReadsFileContentCorrectly()
         {
             TestSetup();
@@ -52,15 +52,6 @@ namespace Lecture_6_Tests
             TextFile file = new TextFile("./file.txt");
             Assert.AreEqual("content of file", file.Content);
             file.Dispose();
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<TextFile> _file = test.CreateVariable<TextFile>();
-            TestSetup();
-            test.Arrange(_file, Expr(() => new TextFile("./file.txt")));
-            test.Assert.AreEqual(Const("content of file"), Expr(_file, f => f.Content));
-            test.Act(Expr(_file, f => f.Dispose()));
-            test.Execute();
         }
         #endregion
 
@@ -74,7 +65,7 @@ namespace Lecture_6_Tests
             test.Execute();
         }
 
-        [TestMethod("b. TextFile.Content equals null after TextFile.Dispose()"), TestCategory("Exercise 7C")]
+        [TemplatedTestMethod("b. TextFile.Content equals null after TextFile.Dispose()"), TestCategory("Exercise 7C")]
         public void TextFileContentEqualsNullAfterDisposable()
         {
             TestSetup();
@@ -84,14 +75,6 @@ namespace Lecture_6_Tests
             file.Dispose();
 
             Assert.IsNull(file.Content);
-
-            // TestTool Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<TextFile> _file = test.CreateVariable<TextFile>();
-            test.Arrange(_file, Expr(() => new TextFile("./file.txt")));
-            test.Act(Expr(_file, f => f.Dispose()));
-            test.Assert.IsNull(Expr(_file, f => f.Content));
-            test.Execute();
         }
         #endregion
     }

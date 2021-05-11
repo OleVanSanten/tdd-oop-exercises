@@ -9,8 +9,8 @@ using static TestTools.Expressions.TestExpression;
 
 namespace Lecture_6_Tests
 {
-    [TestClass]
-    public class Exercise_3_Tests 
+    [TemplatedTestClass]
+    public class Exercise_3_Tests_Template
     {
         #region Exercise 3A
         [TestMethod("a. IRandom is an interface"), TestCategory("Exercise 3A")]
@@ -60,35 +60,21 @@ namespace Lecture_6_Tests
             test.Execute();
         }
 
-        [TestMethod("b. MyRandom.Next() does not return the same value twice (may randomly fail)"), TestCategory("Exercise 3B")]
+        [TemplatedTestMethod("b. MyRandom.Next() does not return the same value twice (may randomly fail)"), TestCategory("Exercise 3B")]
         public void MyRandomNextReturnsRandomNumber()
         {
             MyRandom random = new MyRandom();
             Assert.AreNotEqual(random.Next(), random.Next());
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<MyRandom> _random = test.CreateVariable<MyRandom>();
-            test.Arrange(_random, Expr(() => new MyRandom()));
-            test.Assert.AreNotEqual(Expr(_random, r => r.Next()), Expr(_random, r => r.Next()));
-            test.Execute();
         }
 
-        [TestMethod("c. MyRandom.Next(6) returns a number lower or equal to 6"), TestCategory("Exercise 3B")]
+        [TemplatedTestMethod("c. MyRandom.Next(6) returns a number lower or equal to 6"), TestCategory("Exercise 3B")]
         public void MyRandomNextReturnsExpectedResult()
         {
             MyRandom random = new MyRandom();
             Assert.IsTrue(random.Next(6) <= 6);
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<MyRandom> _random = test.CreateVariable<MyRandom>();
-            test.Arrange(_random, Expr(() => new MyRandom()));
-            test.Assert.IsTrue(Expr(_random, r => r.Next(6) <= 6));
-            test.Execute();
         }
 
-        [TestMethod("d. MyRandom.Next(1, 6) returns a number between 1 and 6"), TestCategory("Exercise 3B")]
+        [TemplatedTestMethod("d. MyRandom.Next(1, 6) returns a number between 1 and 6"), TestCategory("Exercise 3B")]
         public void MyRandomNextReturnsExpectedResult2()
         {
             MyRandom random = new MyRandom();
@@ -96,15 +82,6 @@ namespace Lecture_6_Tests
             int value = random.Next(1, 6);
 
             Assert.IsTrue(1 <= value && value <= 6);
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<MyRandom> _random = test.CreateVariable<MyRandom>();
-            TestVariable<int> _value = test.CreateVariable<int>();
-            test.Arrange(_random, Expr(() => new MyRandom()));
-            test.Arrange(_value, Expr(_random, r => r.Next(1, 6)));
-            test.Assert.IsTrue(Expr(_value, v => 1 <= v && v <= 6));
-            test.Execute();
         }
         #endregion
 
@@ -118,74 +95,39 @@ namespace Lecture_6_Tests
             test.Execute();
         }
 
-        [TestMethod("b. PredictableRandom.Next() returns 4 if constructed with 4"), TestCategory("Exercise 3C")]
+        [TemplatedTestMethod("b. PredictableRandom.Next() returns 4 if constructed with 4"), TestCategory("Exercise 3C")]
         public void PredictableRandomNextReturns4A()
         {
             PredictableRandom random = new PredictableRandom(4);
             Assert.AreEqual(4, random.Next());
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<PredictableRandom> _random = test.CreateVariable<PredictableRandom>();
-            test.Arrange(_random, Expr(() => new PredictableRandom(4)));
-            test.Assert.AreEqual(Const(4), Expr(_random, r => r.Next()));
-            test.Execute();
         }
 
-        [TestMethod("c. PredictableRandom.Next(6) returns 4 if constructed with 4"), TestCategory("Exercise 3C")]
+        [TemplatedTestMethod("c. PredictableRandom.Next(6) returns 4 if constructed with 4"), TestCategory("Exercise 3C")]
         public void PredictableRandomNextReturns4B()
         {
             PredictableRandom random = new PredictableRandom(4);
             Assert.AreEqual(4, random.Next(6));
-
-            //TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<PredictableRandom> _random = test.CreateVariable<PredictableRandom>();
-            test.Arrange(_random, Expr(() => new PredictableRandom(4)));
-            test.Assert.AreEqual(Const(4), Expr(_random, r => r.Next(6)));
-            test.Execute();
         }
 
-        [TestMethod("d. PredictableRandom.Next(6) throws ArgumentException if constructed with 7"), TestCategory("Exercise 3C")]
+        [TemplatedTestMethod("d. PredictableRandom.Next(6) throws ArgumentException if constructed with 7"), TestCategory("Exercise 3C")]
         public void PredictableRandomNextThrowsOn6()
         {
             PredictableRandom random = new PredictableRandom(7);
             Assert.ThrowsException<ArgumentException>(() => random.Next(6));
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<PredictableRandom> _random = test.CreateVariable<PredictableRandom>();
-            test.Arrange(_random, Expr(() => new PredictableRandom(7)));
-            test.Assert.ThrowsExceptionOn<ArgumentException>(Expr(_random, r => r.Next(6)));
-            test.Execute();
         }
 
-        [TestMethod("e. PredictableRandom.Next(1, 6) returns 4 if constructed with 4"), TestCategory("Exercise 3C")]
+        [TemplatedTestMethod("e. PredictableRandom.Next(1, 6) returns 4 if constructed with 4"), TestCategory("Exercise 3C")]
         public void PredictableRandomNextReturns4C()
         {
             PredictableRandom random = new PredictableRandom(4);
             Assert.AreEqual(4, random.Next(1, 6));
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<PredictableRandom> _random = test.CreateVariable<PredictableRandom>();
-            test.Arrange(_random, Expr(() => new PredictableRandom(4)));
-            test.Assert.AreEqual(Const(4), Expr(_random, r => r.Next(1, 6)));
-            test.Execute();
         }
 
-        [TestMethod("f. PredictableRandom.Next(1, 6) throws ArgumentException if constructed with 0"), TestCategory("Exercise 3C")]
+        [TemplatedTestMethod("f. PredictableRandom.Next(1, 6) throws ArgumentException if constructed with 0"), TestCategory("Exercise 3C")]
         public void PredictableRandomNextThrowsOn1And6()
         {
             PredictableRandom random = new PredictableRandom(0);
             Assert.ThrowsException<ArgumentException>(() => random.Next(1, 6));
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<PredictableRandom> _random = test.CreateVariable<PredictableRandom>();
-            test.Arrange(_random, Expr(() => new PredictableRandom(0)));
-            test.Assert.ThrowsExceptionOn<ArgumentException>(Expr(_random, r => r.Next(1, 6)));
-            test.Execute();
         }
         #endregion
     }

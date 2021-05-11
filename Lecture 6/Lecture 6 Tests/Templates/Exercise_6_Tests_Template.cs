@@ -10,8 +10,8 @@ using static TestTools.Expressions.TestExpression;
 
 namespace Lecture_6_Tests
 {
-    [TestClass]
-    public class Exercise_6_Tests 
+    [TemplatedTestClass]
+    public class Exercise_6_Tests_Template
     {
         #region Exercise 6A
         [TestMethod("a.ILogger is an interface"), TestCategory("Exercise 6A")]
@@ -80,7 +80,7 @@ namespace Lecture_6_Tests
             File.WriteAllText(path, "Customer Ryan Johnson was created" + Environment.NewLine);
         }
 
-        [TestMethod("a. FileLogger.Log(string message) appends file"), TestCategory("Exercise 6E")]
+        [TemplatedTestMethod("a. FileLogger.Log(string message) appends file"), TestCategory("Exercise 6E")]
         public void FileLoggerAppendsFile()
         {
             FileLoggerAppendsFileSetup();
@@ -95,36 +95,17 @@ namespace Lecture_6_Tests
                 "Customer Ryan Johnson was created", 
                 "Customer Ryan Johnson was deleted");
             Assert.AreEqual(expectedContent, File.ReadAllText("./log.txt"));
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<FileLogger> _logger = test.CreateVariable<FileLogger>();
-            FileLoggerAppendsFileSetup();
-            test.Arrange(_logger, Expr(() => new FileLogger("./log.txt")));
-            test.Act(Expr(_logger, l => l.Log("Customer Ryan Johnson was deleted")));
-            test.Act(Expr(_logger, l => l.Dispose()));
-            test.Assert.AreEqual(
-                Const(expectedContent),
-                Expr(() => File.ReadAllText("./log.txt")));
-            test.Execute();
         }
         #endregion
 
         #region Exercise 6F
-        [TestMethod("a. ConsoleLogger.Log(string message) writes to console"), TestCategory("Exercise 6F")]
+        [TemplatedTestMethod("a. ConsoleLogger.Log(string message) writes to console"), TestCategory("Exercise 6F")]
         public void ConsoleLoggerWritesToConsole()
         {
             ConsoleLogger logger = new ConsoleLogger();
 
             string expectedWriteout = "Customer Ryan Johnson was deleted";
             ConsoleAssert.WritesOut(() => logger.Log("Customer Ryan Johnson was deleted"), expectedWriteout);
-
-            // TestTools Code
-            UnitTest test = Factory.CreateTest();
-            TestVariable<ConsoleLogger> _logger = test.CreateVariable<ConsoleLogger>();
-            test.Arrange(_logger, Expr(() => new ConsoleLogger()));
-            test.ConsoleAssert.WritesOut(Lambda(Expr(_logger, l => l.Log("Customer Ryan Johnson was deleted"))), Const(expectedWriteout));
-            test.Execute();
         }
         #endregion
     }
