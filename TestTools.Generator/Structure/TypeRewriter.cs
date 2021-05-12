@@ -11,15 +11,16 @@ using TestTools.TypeSystem;
 namespace TestTools.Structure
 {
     // Source Generator of TypeVisitor
+    // TypeRewriter translates and verifies statements
     public class TypeRewriter : CSharpSyntaxRewriter
     {
+        private ICompileTimeDescriptionResolver _resolver;
         private IStructureService _structureService;
-        private Compilation _compilation;
-
-        public TypeRewriter(IStructureService structureService, Compilation compilation)
+        
+        public TypeRewriter(ICompileTimeDescriptionResolver resolver, IStructureService structureService)
         {
+            _resolver = resolver;
             _structureService = structureService;
-            _compilation = compilation;
         }
 
         public ITypeVerifier[] TypeVerifiers { get; set; } = new ITypeVerifier[]
@@ -40,89 +41,10 @@ namespace TestTools.Structure
                 new UnchangedPropertyTypeVerifier()
         };
 
-        public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
-        {
-            // Only classes marked with an attritubes that are marked with TemplatedAttribute should be rewritten
-            var type = GetTypeDescription(node);
-            var attributesOfAttributes = type.GetCustomAttributeTypes().SelectMany(t => t.GetCustomAttributes());
-            if (!attributesOfAttributes.Any(a => a is AttributeEquivalentAttribute))
-                return node;
-
-            // Potentially rewritting the class name by removing _Templated from it
-            var newClassName = node.Identifier.Text.Replace("_Template", "");
-            var newIdentifier = SyntaxFactory.IdentifierName(newClassName).Identifier;
-
-            // Potentially rewritting the class members
-            var newMembers = new SyntaxList<SyntaxNode>(node.Members.Select(Visit));
-
-            // Potentially rewritting attributes
-            var newAttributeLists = new SyntaxList<AttributeListSyntax>(node.AttributeLists.Select(Visit).OfType<AttributeListSyntax>());
-
-            return node.WithIdentifier(newIdentifier).WithMembers(newMembers).WithAttributeLists(newAttributeLists);
-        }
-
-        public override SyntaxNode VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
-        {
-            // Only constructors in classes marked with an attritubes that are marked with TemplatedAttribute should be rewritten
-            var type = GetConstructorDescription(node).DeclaringType;
-            var attributesOfAttributes = type.GetCustomAttributeTypes().SelectMany(t => t.GetCustomAttributes());
-            if (!attributesOfAttributes.Any(a => a is AttributeEquivalentAttribute))
-                return node;
-
-            // Potentially rewritting the class name by removing _Templated from it
-            var newClassName = node.Identifier.Text.Replace("_Template", "");
-            var newIdentifier = SyntaxFactory.IdentifierName(newClassName).Identifier;
-
-            return node.WithIdentifier(newIdentifier);
-        }
-
-        public override SyntaxNode VisitAttribute(AttributeSyntax node)
-        {
-            var templatedAttribute = GetTemplatedAttribute(node);
-
-            if (templatedAttribute == null)
-                return node;
-
-            // Rewritting templated-attribute type to non-templated-attribute type
-            var newName = SyntaxFactory.IdentifierName(templatedAttribute.EquavilentAttribute);
-            
-            return node.WithName(newName);
-        }
-
-        public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
-        {
-            // Only methods marked with an attritubes that are marked with TemplatedAttribute should be rewritten
-            var method = GetMethodDescription(node);
-            var attributesOfAttributes = method.GetCustomAttributeTypes().SelectMany(t => t.GetCustomAttributes());
-            if (!attributesOfAttributes.Any(a => a is AttributeEquivalentAttribute))
-                return node;
-
-            // Rewritting the method body to switch out all FromNamespace members with ToNamespace members
-            // If the rewrite is unsuccessful due to validation errors, the entire method body is replaced
-            // with an exception 
-            // and if the rewrite validation fails replacing the entire body with an exception
-            BlockSyntax newBody;
-            var newAttributeLists = new SyntaxList<AttributeListSyntax>(node.AttributeLists.Select(Visit).OfType<AttributeListSyntax>());
-
-            try
-            {
-                var newStatements = new SyntaxList<StatementSyntax>(node.Body.Statements.Select(Visit).OfType<StatementSyntax>());
-                newBody = SyntaxFactory.Block(newStatements); 
-            }
-            catch (VerifierServiceException ex)
-            {
-                var exceptionType = $"Microsoft.VisualStudio.TestTools.UnitTesting.AssertFailedException";
-                var throwStatement = $"throw new {exceptionType}(\"{ex.Message} (AUTO)\");";
-                newBody = (BlockSyntax)SyntaxFactory.ParseStatement("{" + throwStatement + "}");
-            }
-
-            return node.WithBody(newBody).WithAttributeLists(newAttributeLists);
-        }
-
         public override SyntaxNode VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
         {
-            var originalType = GetTypeDescription(node);
-            var originalConstructor = GetConstructorDescription(node);
+            var originalConstructor = _resolver.GetConstructorDescription(node);
+            var originalType = originalConstructor.DeclaringType;
 
             _structureService.VerifyType(originalType, TypeVerifiers);
             _structureService.VerifyMember(
@@ -131,7 +53,7 @@ namespace TestTools.Structure
                 MemberVerificationAspect.MemberType,
                 MemberVerificationAspect.ConstructorAccessLevel);
 
-            var translatedType = (CompileTimeTypeDescription)_structureService.TranslateType(originalType);
+            var translatedType = _structureService.TranslateType(originalType);
             var newType = SyntaxFactory.ParseTypeName(translatedType.FullName);
             return node.WithType(newType);
         }
@@ -143,8 +65,8 @@ namespace TestTools.Structure
             if (memberExpression == null)
                 return node;
 
-            var originalType = GetTypeDescription(memberExpression.Expression);
-            var originalMethod = GetMethodDescription(node);
+            var originalMethod = _resolver.GetMethodDescription(node);
+            var originalType = originalMethod.DeclaringType;
 
             _structureService.VerifyType(originalType, TypeVerifiers);
             _structureService.VerifyMember(
@@ -159,7 +81,7 @@ namespace TestTools.Structure
                 MemberVerificationAspect.MethodAccessLevel);
 
             // Potentially rewritting expression and method name 
-            var translatedMethod = (CompileTimeMethodDescription)_structureService.TranslateMember(originalMethod);
+            var translatedMethod = _structureService.TranslateMember(originalMethod);
             SimpleNameSyntax newName;
             if (memberExpression.Name is GenericNameSyntax genericNameSyntax)
             {
@@ -181,11 +103,15 @@ namespace TestTools.Structure
 
         public override SyntaxNode VisitMemberAccessExpression(MemberAccessExpressionSyntax node)
         {
-            var originalType = GetTypeDescription(node.Expression);
-            var originalMember = GetFieldOrPropertyDescription(node);
+            var originalMember = _resolver.GetMemberDescription(node);
+            var originalType = originalMember.DeclaringType;
 
             _structureService.VerifyType(originalType, TypeVerifiers);
-            if (originalMember is FieldDescription)
+            if (originalMember is EventDescription)
+            {
+
+            }
+            else if (originalMember is FieldDescription)
             {
                 _structureService.VerifyMember(
                     originalMember,
@@ -220,100 +146,18 @@ namespace TestTools.Structure
 
         public override SyntaxNode VisitVariableDeclaration(VariableDeclarationSyntax node)
         {
-            var originalType = GetTypeDescription(node.Type);
+            var originalType = _resolver.GetTypeDescription(node);
 
             _structureService.VerifyType(originalType, TypeVerifiers);
 
             // Potentially rewritting type
-            var translatedType = (CompileTimeTypeDescription)_structureService.TranslateType(originalType);
-            var newType = SyntaxFactory.ParseTypeName(translatedType.TypeSymbol.ToDisplayString());
+            var translatedType = _structureService.TranslateType(originalType);
+            var newType = SyntaxFactory.ParseTypeName(translatedType.Name);
 
             // Potentially rewritting variable declators
             var newVariables = SyntaxFactory.SeparatedList(node.Variables.Select(Visit).OfType<VariableDeclaratorSyntax>());
             
             return node.WithType(newType).WithVariables(newVariables);
-        }
-
-        TypeDescription GetTypeDescription(SyntaxNode node)
-        {
-            var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
-            var typeSymbol = semanticModel.GetTypeInfo(node).Type;
-
-            return new CompileTimeTypeDescription(typeSymbol);
-        }
-
-        TypeDescription GetTypeDescription(ClassDeclarationSyntax node)
-        {
-            var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
-            var typeModel = semanticModel.GetDeclaredSymbol(node);
-
-            return new CompileTimeTypeDescription(typeModel);
-        }
-
-        // Returns TemplatedAttribute object if attribute class is marked with [TemplatedAttribute]
-        AttributeEquivalentAttribute GetTemplatedAttribute(AttributeSyntax node)
-        {
-            var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
-            var attributeSymbol = (IMethodSymbol)semanticModel.GetSymbolInfo(node).Symbol;
-            var attributeClass = attributeSymbol.ContainingType;
-            var attributeDescription = new CompileTimeTypeDescription(attributeClass);
-
-            // Check if it contains any TemplateEquivalentAttribute at all
-            var targetAttribute = new RuntimeTypeDescription(typeof(AttributeEquivalentAttribute));
-            if (!attributeDescription.GetCustomAttributeTypes().Contains(targetAttribute))
-                return null;
-
-            return attributeDescription.GetCustomAttributes().OfType<AttributeEquivalentAttribute>().FirstOrDefault();
-        }
-
-        ConstructorDescription GetConstructorDescription(ObjectCreationExpressionSyntax node)
-        {
-            var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
-            var methodSymbol = (IMethodSymbol)semanticModel.GetSymbolInfo(node).Symbol;
-
-            return new CompileTimeConstructorDescription(methodSymbol);
-        }
-
-        MethodDescription GetConstructorDescription(ConstructorDeclarationSyntax node)
-        {
-            var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
-            var methodSymbol = semanticModel.GetDeclaredSymbol(node);
-
-            return new CompileTimeMethodDescription(methodSymbol);
-        }
-
-        MemberDescription GetFieldOrPropertyDescription(MemberAccessExpressionSyntax node)
-        {
-            
-            var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
-            var memberSymbol = semanticModel.GetSymbolInfo(node).Symbol;
-
-            if (memberSymbol is IFieldSymbol fieldSymbol)
-                return new CompileTimeFieldDescription(fieldSymbol);
-
-            if (memberSymbol is IPropertySymbol propertySymbol)
-                return new CompileTimePropertyDescription(propertySymbol);
-
-            if (memberSymbol is IMethodSymbol methodSymbol)
-                return new CompileTimeMethodDescription(methodSymbol);
-
-            throw new NotImplementedException();
-        }
-
-        MethodDescription GetMethodDescription(InvocationExpressionSyntax node)
-        {
-            var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
-            var methodSymbol = (IMethodSymbol)semanticModel.GetSymbolInfo(node).Symbol;
-
-            return new CompileTimeMethodDescription(methodSymbol);
-        }
-
-        MethodDescription GetMethodDescription(MethodDeclarationSyntax node)
-        {
-            var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
-            var methodSymbol = semanticModel.GetDeclaredSymbol(node);
-
-            return new CompileTimeMethodDescription(methodSymbol);
         }
     }
 }

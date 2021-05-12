@@ -10,6 +10,9 @@ namespace TestTools.TypeSystem
     {
         public RuntimeMethodDescription(MethodInfo methodInfo)
         {
+            if (methodInfo == null)
+                throw new ArgumentNullException("methodInfo");
+
             MethodInfo = methodInfo;
         }
 

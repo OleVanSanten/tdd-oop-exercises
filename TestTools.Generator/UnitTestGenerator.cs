@@ -61,24 +61,19 @@ namespace TestTools.Templates
             if (syntaxReceiver == null)
                 return;
 
-            var templatedAttributeType = new RuntimeTypeDescription(typeof(AttributeEquivalentAttribute));
-
             var configuration = GetConfiguration(context);
+            var syntaxResolver = new CompileTimeDescriptionResolver(context.Compilation);
             var structureService = ConfigureStructureService(context.Compilation, configuration);
-            var typeRewriter = ConfigureTypeRewriter(structureService, context.Compilation, configuration);
+            var typeRewriter = ConfigureTypeRewriter(syntaxResolver, structureService, configuration);
+            var templateRewriter = new TemplateRewriter(syntaxResolver, typeRewriter);
 
             foreach (var node in syntaxReceiver.CandidateSyntax)
             {
-                var model = context.Compilation.GetSemanticModel(node.SyntaxTree);
-                var symbol = (ITypeSymbol)model.GetDeclaredSymbol(node, context.CancellationToken);
-                var typeDescription = new CompileTimeTypeDescription(symbol);
-                var attributeOfAttributes = typeDescription.GetCustomAttributeTypes().SelectMany(t => t.GetCustomAttributeTypes());
-
-                if (!attributeOfAttributes.Contains(templatedAttributeType))
+                if (syntaxResolver.GetTemplatedAttribute(node) == null)
                     continue;
 
-                var fileName = $"{symbol?.ToDisplayString()}.g.cs";
-                var rewrittenNode = typeRewriter.Visit(node.SyntaxTree.GetRoot(context.CancellationToken));
+                var fileName = $"{node.Identifier}.g.cs";
+                var rewrittenNode = templateRewriter.Visit(node.SyntaxTree.GetRoot(context.CancellationToken));
                 var source = SourceText.From(rewrittenNode.NormalizeWhitespace().ToFullString(), Encoding.UTF8);
                 context.AddSource(fileName, source);
             }
@@ -124,12 +119,12 @@ namespace TestTools.Templates
             return structureService;
         }
 
-        private TypeRewriter ConfigureTypeRewriter(IStructureService structureService, Compilation compilation, XMLConfiguration config)
+        private TypeRewriter ConfigureTypeRewriter(ICompileTimeDescriptionResolver syntaxResolver, IStructureService structureService,  XMLConfiguration config)
         {
             var typeVerifiers = config.GetTypeVerifiers();
             var memberVerifiers = config.GetMemberVerifiers();
 
-            var typeRewritter = new TypeRewriter(structureService, compilation);
+            var typeRewritter = new TypeRewriter(syntaxResolver, structureService);
 
             if (typeVerifiers != null)
                 typeRewritter.TypeVerifiers = typeVerifiers;
@@ -142,17 +137,14 @@ namespace TestTools.Templates
 
         private class SyntaxReceiver : ISyntaxReceiver
         {
-            private readonly List<SyntaxNode> _candidateSyntax = new List<SyntaxNode>();
+            private readonly List<ClassDeclarationSyntax> _candidateSyntax = new List<ClassDeclarationSyntax>();
 
-            public IEnumerable<SyntaxNode> CandidateSyntax => _candidateSyntax;
+            public IEnumerable<ClassDeclarationSyntax> CandidateSyntax => _candidateSyntax;
 
             public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
             {
                 if (syntaxNode is ClassDeclarationSyntax classDeclarationSyntax)
                     _candidateSyntax.Add(classDeclarationSyntax);
-
-                //if (syntaxNode is MemberDeclarationSyntax memberDeclarationSyntax)
-                //    _candidateSyntax.Add(memberDeclarationSyntax);
             }
         }
     }
