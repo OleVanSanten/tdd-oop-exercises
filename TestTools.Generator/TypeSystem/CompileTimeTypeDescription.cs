@@ -9,17 +9,22 @@ namespace TestTools.TypeSystem
 {
     public class CompileTimeTypeDescription : TypeDescription
     {
-        public CompileTimeTypeDescription(ITypeSymbol typeSymbol)
+        public CompileTimeTypeDescription(Compilation compilation, ITypeSymbol typeSymbol)
         {
+            if (compilation == null)
+                throw new ArgumentNullException("compilation");
             if (typeSymbol == null)
-                throw new ArgumentNullException();
+                throw new ArgumentNullException("typeSymbol");
 
             TypeSymbol = typeSymbol;
+            Compilation = compilation;
         }
 
         public ITypeSymbol TypeSymbol { get; }
 
-        public override TypeDescription BaseType => new CompileTimeTypeDescription(TypeSymbol.BaseType);
+        public Compilation Compilation { get; }
+
+        public override TypeDescription BaseType => new CompileTimeTypeDescription(Compilation, TypeSymbol.BaseType);
 
         public override string Name => TypeSymbol.Name;
 
@@ -30,9 +35,9 @@ namespace TestTools.TypeSystem
                 INamespaceSymbol namespaceSymbol = TypeSymbol.ContainingNamespace;
 
                 if (namespaceSymbol == null)
-                    throw new NotImplementedException("Types in global namespaces are not supported");
+                    return new CompileTimeNamespaceDescription(Compilation, Compilation.GlobalNamespace).Name;
 
-                return new CompileTimeNamespaceDescription(namespaceSymbol).Name;
+                return new CompileTimeNamespaceDescription(Compilation, namespaceSymbol).Name;
             }
         }
 
@@ -60,7 +65,7 @@ namespace TestTools.TypeSystem
             for (int i = 0; i < members.Length; i++)
             {
                 if (members[i] is IMethodSymbol method && method.MethodKind == MethodKind.Constructor)
-                    output.Add(new CompileTimeConstructorDescription(method));
+                    output.Add(new CompileTimeConstructorDescription(Compilation, method));
             }
 
             return output.ToArray();
@@ -85,10 +90,20 @@ namespace TestTools.TypeSystem
 
             for(int i = 0; i < attributes.Length; i++)
             {
-                output.Add(new CompileTimeTypeDescription(attributes[i].AttributeClass));
+                output.Add(new CompileTimeTypeDescription(Compilation, attributes[i].AttributeClass));
             }
 
             return output.ToArray();
+        }
+
+        public override TypeDescription GetElementType()
+        {
+            if (IsArray)
+            {
+                var arrayType = (IArrayTypeSymbol)TypeSymbol;
+                return new CompileTimeTypeDescription(Compilation, arrayType.ElementType);
+            }
+            return null;
         }
 
         public override EventDescription[] GetEvents()
@@ -99,7 +114,7 @@ namespace TestTools.TypeSystem
             for (int i = 0; i < members.Length; i++)
             {
                 if (members[i] is IEventSymbol @event)
-                    output.Add(new CompileTimeEventDescription(@event));
+                    output.Add(new CompileTimeEventDescription(Compilation, @event));
             }
 
             return output.ToArray();
@@ -113,7 +128,7 @@ namespace TestTools.TypeSystem
             for (int i = 0; i < members.Length; i++)
             {
                 if (members[i] is IFieldSymbol field)
-                    output.Add(new CompileTimeFieldDescription(field));
+                    output.Add(new CompileTimeFieldDescription(Compilation, field));
             }
 
             return output.ToArray();
@@ -126,7 +141,7 @@ namespace TestTools.TypeSystem
 
             for (int i = 0; i < interfaces.Length; i++)
             {
-                output.Add(new CompileTimeTypeDescription(interfaces[i]));
+                output.Add(new CompileTimeTypeDescription(Compilation, interfaces[i]));
             }
 
             return output.ToArray();
@@ -140,7 +155,7 @@ namespace TestTools.TypeSystem
             for (int i = 0; i < members.Length; i++)
             {
                 if (members[i] is IMethodSymbol method && method.MethodKind == MethodKind.Ordinary)
-                    output.Add(new CompileTimeMethodDescription(method));
+                    output.Add(new CompileTimeMethodDescription(Compilation, method));
             }
 
             return output.ToArray();
@@ -153,7 +168,7 @@ namespace TestTools.TypeSystem
 
             for(int i = 0; i < nestedTypes.Length; i++)
             {
-                output.Add(new CompileTimeTypeDescription(nestedTypes[i]));
+                output.Add(new CompileTimeTypeDescription(Compilation, nestedTypes[i]));
             }
 
             return output.ToArray();
@@ -167,10 +182,16 @@ namespace TestTools.TypeSystem
             for(int i = 0; i < members.Length; i++)
             {
                 if (members[i] is IPropertySymbol property)
-                    output.Add(new CompileTimePropertyDescription(property));
+                    output.Add(new CompileTimePropertyDescription(Compilation, property));
             }
 
             return output.ToArray();
+        }
+
+        public override TypeDescription MakeArrayType()
+        {
+            var arrayType = Compilation.CreateArrayTypeSymbol(TypeSymbol);
+            return new CompileTimeTypeDescription(Compilation, arrayType);
         }
     }
 }

@@ -10,19 +10,27 @@ namespace TestTools.TypeSystem
     {
         INamespaceSymbol _namespaceSymbol;
 
-        public CompileTimeNamespaceDescription(INamespaceSymbol namespaceSymbol)
+        public CompileTimeNamespaceDescription(Compilation compilation, INamespaceSymbol namespaceSymbol)
         {
+            if (compilation == null)
+                throw new ArgumentNullException("compilation");
+            if (namespaceSymbol == null)
+                throw new ArgumentNullException("namespaceSymbol");
+
+            Compilation = compilation;
             _namespaceSymbol = namespaceSymbol;
         }
 
-        public override NamespaceDescription ContainingNamespace => new CompileTimeNamespaceDescription(_namespaceSymbol.ContainingNamespace);
+        public Compilation Compilation { get; }
+
+        public override NamespaceDescription ContainingNamespace => new CompileTimeNamespaceDescription(Compilation, _namespaceSymbol.ContainingNamespace);
 
         public override string Name => GetFullName(_namespaceSymbol);
 
         public override NamespaceDescription[] GetNamespaces()
         {
             var namespaces = _namespaceSymbol.GetNamespaceMembers();
-            return namespaces.Select(n => new CompileTimeNamespaceDescription(n)).ToArray();
+            return namespaces.Select(n => new CompileTimeNamespaceDescription(Compilation, n)).ToArray();
         }
 
         public override TypeDescription[] GetTypes()
@@ -32,7 +40,7 @@ namespace TestTools.TypeSystem
 
             for(int i = 0; i < types.Length; i++)
             {
-                output.Add(new CompileTimeTypeDescription(types[i]));
+                output.Add(new CompileTimeTypeDescription(Compilation, types[i]));
             }
             return output.ToArray();
         }

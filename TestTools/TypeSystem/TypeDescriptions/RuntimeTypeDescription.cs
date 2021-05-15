@@ -10,6 +10,9 @@ namespace TestTools.TypeSystem
     {
         public RuntimeTypeDescription(Type type)
         {
+            if (type == null)
+                throw new ArgumentNullException("type");
+
             Type = type;
         }
 
@@ -54,6 +57,12 @@ namespace TestTools.TypeSystem
             return attributes.Select(t => new RuntimeTypeDescription(t.GetType())).ToArray();
         }
 
+        public override TypeDescription GetElementType()
+        {
+            var elementType = Type.GetElementType();
+            return elementType != null ? new RuntimeTypeDescription(elementType) : null;
+        }
+
         public override EventDescription[] GetEvents()
         {
             var allEvents = Type.GetEvents(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
@@ -87,6 +96,11 @@ namespace TestTools.TypeSystem
         {
             var allProperties = Type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Instance);
             return allProperties.Select(p => new RuntimePropertyDescription(p)).ToArray();
+        }
+
+        public override TypeDescription MakeArrayType()
+        {
+            return new RuntimeTypeDescription(Type.MakeArrayType());
         }
     }
 }

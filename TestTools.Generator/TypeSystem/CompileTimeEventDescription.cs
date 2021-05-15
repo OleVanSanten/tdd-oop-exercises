@@ -9,22 +9,30 @@ namespace TestTools.TypeSystem
 {
     public class CompileTimeEventDescription : EventDescription
     {
-        public CompileTimeEventDescription(IEventSymbol eventSymbol)
+        public CompileTimeEventDescription(Compilation compilation, IEventSymbol eventSymbol)
         {
+            if (compilation == null)
+                throw new ArgumentNullException("compilation");
+            if (eventSymbol == null)
+                throw new ArgumentNullException("eventSymbol");
+
+            Compilation = compilation;
             EventSymbol = eventSymbol;
         }
 
+        public Compilation Compilation { get; }
+
         public IEventSymbol EventSymbol { get; }
 
-        public override MethodDescription AddMethod => new CompileTimeMethodDescription(EventSymbol.AddMethod);
+        public override MethodDescription AddMethod => new CompileTimeMethodDescription(Compilation, EventSymbol.AddMethod);
 
-        public override TypeDescription DeclaringType => new CompileTimeTypeDescription(EventSymbol.ContainingType);
+        public override TypeDescription DeclaringType => new CompileTimeTypeDescription(Compilation, EventSymbol.ContainingType);
 
-        public override TypeDescription EventHandlerType => new CompileTimeTypeDescription(EventSymbol.Type);
+        public override TypeDescription EventHandlerType => new CompileTimeTypeDescription(Compilation, EventSymbol.Type);
 
         public override string Name => EventSymbol.Name;
 
-        public override MethodDescription RemoveMethod => new CompileTimeMethodDescription(EventSymbol.RemoveMethod);
+        public override MethodDescription RemoveMethod => new CompileTimeMethodDescription(Compilation, EventSymbol.RemoveMethod);
 
         // Please note, GetCustomAttributes might return fewer results than
         // GetCustomAttributeTypes, because attributes cannot be loaded from 
@@ -45,7 +53,7 @@ namespace TestTools.TypeSystem
 
             for (int i = 0; i < attributes.Length; i++)
             {
-                output.Add(new CompileTimeTypeDescription(attributes[i].AttributeClass));
+                output.Add(new CompileTimeTypeDescription(Compilation, attributes[i].AttributeClass));
             }
 
             return output.ToArray();

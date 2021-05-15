@@ -25,7 +25,7 @@ namespace TestTools.Structure
             var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
             var methodSymbol = (IMethodSymbol)semanticModel.GetSymbolInfo(node).Symbol;
 
-            return new CompileTimeConstructorDescription(methodSymbol);
+            return new CompileTimeConstructorDescription(_compilation, methodSymbol);
         }
 
         public ConstructorDescription GetConstructorDescription(ConstructorDeclarationSyntax node)
@@ -33,7 +33,7 @@ namespace TestTools.Structure
             var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
             var methodSymbol = semanticModel.GetDeclaredSymbol(node);
 
-            return new CompileTimeConstructorDescription(methodSymbol);
+            return new CompileTimeConstructorDescription(_compilation, methodSymbol);
         }
 
         public MemberDescription GetMemberDescription(MemberAccessExpressionSyntax node)
@@ -42,16 +42,16 @@ namespace TestTools.Structure
             var memberSymbol = semanticModel.GetSymbolInfo(node).Symbol;
 
             if (memberSymbol is IEventSymbol eventSymbol)
-                return new CompileTimeEventDescription(eventSymbol);
+                return new CompileTimeEventDescription(_compilation, eventSymbol);
 
             if (memberSymbol is IFieldSymbol fieldSymbol)
-                return new CompileTimeFieldDescription(fieldSymbol);
+                return new CompileTimeFieldDescription(_compilation, fieldSymbol);
 
             if (memberSymbol is IMethodSymbol methodSymbol)
-                return new CompileTimeMethodDescription(methodSymbol);
+                return new CompileTimeMethodDescription(_compilation, methodSymbol);
 
             if (memberSymbol is IPropertySymbol propertySymbol)
-                return new CompileTimePropertyDescription(propertySymbol);
+                return new CompileTimePropertyDescription(_compilation, propertySymbol);
 
             throw new ArgumentException("Node cannot be converted to IEventSymbol, IFieldSymbol, IMethodSymbol, or IPropertySymbol");
         }
@@ -61,7 +61,7 @@ namespace TestTools.Structure
             var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
             var methodSymbol = (IMethodSymbol)semanticModel.GetSymbolInfo(node).Symbol;
 
-            return new CompileTimeMethodDescription(methodSymbol);
+            return new CompileTimeMethodDescription(_compilation, methodSymbol);
         }
 
         public MethodDescription GetMethodDescription(MethodDeclarationSyntax node)
@@ -69,7 +69,7 @@ namespace TestTools.Structure
             var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
             var methodSymbol = semanticModel.GetDeclaredSymbol(node);
 
-            return new CompileTimeMethodDescription(methodSymbol);
+            return new CompileTimeMethodDescription(_compilation, methodSymbol);
         }
 
         // Returns TemplatedAttribute object if attribute class is marked with [TemplatedAttribute]
@@ -78,7 +78,7 @@ namespace TestTools.Structure
             var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
             var attributeSymbol = semanticModel.GetSymbolInfo(node).Symbol;
             var attributeClass = attributeSymbol.ContainingType;
-            var attributeDescription = new CompileTimeTypeDescription(attributeClass);
+            var attributeDescription = new CompileTimeTypeDescription(_compilation, attributeClass);
 
             // Check if it contains any TemplateEquivalentAttribute at all
             var targetAttribute = new RuntimeTypeDescription(typeof(AttributeEquivalentAttribute));
@@ -109,7 +109,7 @@ namespace TestTools.Structure
             var semanticModel = _compilation.GetSemanticModel(node.SyntaxTree, ignoreAccessibility: true);
             var typeModel = semanticModel.GetDeclaredSymbol(node);
 
-            return new CompileTimeTypeDescription(typeModel);
+            return new CompileTimeTypeDescription(_compilation, typeModel);
         }
 
         public TypeDescription GetTypeDescription(VariableDeclarationSyntax node)
@@ -117,7 +117,7 @@ namespace TestTools.Structure
             var semanticModel = _compilation.GetSemanticModel(node.Type.SyntaxTree, ignoreAccessibility: true);
             var typeSymbol = semanticModel.GetTypeInfo(node.Type).Type;
 
-            return new CompileTimeTypeDescription(typeSymbol);
+            return new CompileTimeTypeDescription(_compilation, typeSymbol);
         }
     }
 }

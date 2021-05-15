@@ -9,16 +9,24 @@ namespace TestTools.TypeSystem
 {
     public class CompileTimeFieldDescription : FieldDescription
     {
-        public CompileTimeFieldDescription(IFieldSymbol fieldSymbol)
+        public CompileTimeFieldDescription(Compilation compilation, IFieldSymbol fieldSymbol)
         {
+            if (compilation == null)
+                throw new ArgumentNullException("compilation");
+            if (fieldSymbol == null)
+                throw new ArgumentNullException("fieldSymbol");
+
+            Compilation = compilation;
             FieldSymbol = fieldSymbol;
         }
 
+        public Compilation Compilation { get; }
+
         public IFieldSymbol FieldSymbol { get; }
 
-        public override TypeDescription DeclaringType => new CompileTimeTypeDescription(FieldSymbol.ContainingType);
+        public override TypeDescription DeclaringType => new CompileTimeTypeDescription(Compilation, FieldSymbol.ContainingType);
 
-        public override TypeDescription FieldType => new CompileTimeTypeDescription(FieldSymbol.Type);
+        public override TypeDescription FieldType => new CompileTimeTypeDescription(Compilation, FieldSymbol.Type);
 
         public override bool IsAssembly
         {
@@ -81,7 +89,7 @@ namespace TestTools.TypeSystem
 
             for (int i = 0; i < attributes.Length; i++)
             {
-                output.Add(new CompileTimeTypeDescription(attributes[i].AttributeClass));
+                output.Add(new CompileTimeTypeDescription(Compilation, attributes[i].AttributeClass));
             }
 
             return output.ToArray();

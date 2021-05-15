@@ -7,10 +7,18 @@ namespace TestTools.TypeSystem
 {
     public class CompileTimeParameterDescription : ParameterDescription
     {
-        public CompileTimeParameterDescription(IParameterSymbol parameterSymbol)
+        public CompileTimeParameterDescription(Compilation compilation, IParameterSymbol parameterSymbol)
         {
+            if (compilation == null)
+                throw new ArgumentNullException("compilation");
+            if (parameterSymbol == null)
+                throw new ArgumentNullException("parameterSymbol");
+
+            Compilation = compilation;
             ParameterSymbol = parameterSymbol;
         }
+
+        public Compilation Compilation { get; }
 
         public IParameterSymbol ParameterSymbol;
 
@@ -24,6 +32,6 @@ namespace TestTools.TypeSystem
 
         public override string Name => ParameterSymbol.Name;
 
-        public override TypeDescription ParameterType => new CompileTimeTypeDescription(ParameterSymbol.Type);
+        public override TypeDescription ParameterType => new CompileTimeTypeDescription(Compilation, ParameterSymbol.Type);
     }
 }

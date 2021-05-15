@@ -9,14 +9,22 @@ namespace TestTools.TypeSystem
 {
     public class CompileTimeConstructorDescription : ConstructorDescription
     {
-        public CompileTimeConstructorDescription(IMethodSymbol methodSymbol)
+        public CompileTimeConstructorDescription(Compilation compilation, IMethodSymbol methodSymbol)
         {
+            if (compilation == null)
+                throw new ArgumentNullException("compilation");
+            if (methodSymbol == null)
+                throw new ArgumentNullException("methodSymbol");
+
+            Compilation = compilation;
             MethodSymbol = methodSymbol;
         }
 
+        public Compilation Compilation { get; }
+
         public IMethodSymbol MethodSymbol { get; }
 
-        public override TypeDescription DeclaringType => new CompileTimeTypeDescription(MethodSymbol.ContainingType);
+        public override TypeDescription DeclaringType => new CompileTimeTypeDescription(Compilation, MethodSymbol.ContainingType);
 
         public override bool IsAssembly
         {
@@ -81,7 +89,7 @@ namespace TestTools.TypeSystem
 
             for (int i = 0; i < attributes.Length; i++)
             {
-                output.Add(new CompileTimeTypeDescription(attributes[i].AttributeClass));
+                output.Add(new CompileTimeTypeDescription(Compilation, attributes[i].AttributeClass));
             }
 
             return output.ToArray();
@@ -95,7 +103,7 @@ namespace TestTools.TypeSystem
 
             for (int i = 0; i < parameters.Length; i++)
             {
-                output.Add(new CompileTimeParameterDescription(parameters[i]));
+                output.Add(new CompileTimeParameterDescription(Compilation, parameters[i]));
             }
 
             return output.ToArray();

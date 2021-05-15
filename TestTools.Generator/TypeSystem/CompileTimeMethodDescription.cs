@@ -9,14 +9,22 @@ namespace TestTools.TypeSystem
 {
     public class CompileTimeMethodDescription : MethodDescription
     {
-        public CompileTimeMethodDescription(IMethodSymbol methodSymbol)
+        public CompileTimeMethodDescription(Compilation compilation, IMethodSymbol methodSymbol)
         {
+            if (compilation == null)
+                throw new ArgumentNullException("compilation");
+            if (methodSymbol == null)
+                throw new ArgumentNullException("methodSymbol");
+
             MethodSymbol = methodSymbol;
+            Compilation = compilation;
         }
 
-       public IMethodSymbol MethodSymbol { get; }
+        public Compilation Compilation { get; }
 
-        public override TypeDescription DeclaringType => new CompileTimeTypeDescription(MethodSymbol.ContainingType);
+        public IMethodSymbol MethodSymbol { get; }
+
+        public override TypeDescription DeclaringType => new CompileTimeTypeDescription(Compilation, MethodSymbol.ContainingType);
 
         public override bool IsAbstract => MethodSymbol.IsAbstract;
 
@@ -62,7 +70,7 @@ namespace TestTools.TypeSystem
 
         public override string Name => MethodSymbol.Name;
 
-        public override TypeDescription ReturnType => new CompileTimeTypeDescription(MethodSymbol.ReturnType);
+        public override TypeDescription ReturnType => new CompileTimeTypeDescription(Compilation, MethodSymbol.ReturnType);
 
         // Please note, GetCustomAttributes might return fewer results than
         // GetCustomAttributeTypes, because attributes cannot be loaded from 
@@ -83,7 +91,7 @@ namespace TestTools.TypeSystem
 
             for (int i = 0; i < attributes.Length; i++)
             {
-                output.Add(new CompileTimeTypeDescription(attributes[i].AttributeClass));
+                output.Add(new CompileTimeTypeDescription(Compilation, attributes[i].AttributeClass));
             }
 
             return output.ToArray();
@@ -96,7 +104,7 @@ namespace TestTools.TypeSystem
 
             for(int i = 0; i < parameters.Length; i++)
             {
-                output.Add(new CompileTimeParameterDescription(parameters[i]));
+                output.Add(new CompileTimeParameterDescription(Compilation, parameters[i]));
             }
 
             return output.ToArray();

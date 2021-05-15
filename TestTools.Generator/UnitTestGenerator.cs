@@ -98,7 +98,7 @@ namespace TestTools.Templates
 
         private IStructureService ConfigureStructureService(Compilation compilation, XMLConfiguration config)
         {
-            var globalNamespace = new CompileTimeNamespaceDescription(compilation.GlobalNamespace);
+            var globalNamespace = new CompileTimeNamespaceDescription(compilation, compilation.GlobalNamespace);
             var fromNamespace = config.GetFromNamespace(globalNamespace);
             var toNamespace = config.GetToNamespace(globalNamespace);
 

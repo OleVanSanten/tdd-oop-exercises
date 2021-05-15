@@ -9,10 +9,18 @@ namespace TestTools.TypeSystem
 {
     public class CompileTimePropertyDescription : PropertyDescription
     {
-        public CompileTimePropertyDescription(IPropertySymbol propertySymbol)
+        public CompileTimePropertyDescription(Compilation compilation, IPropertySymbol propertySymbol)
         {
+            if (compilation == null)
+                throw new ArgumentNullException("compilation");
+            if (propertySymbol == null)
+                throw new ArgumentNullException("propertySymbol");
+
+            Compilation = compilation;
             PropertySymbol = propertySymbol;
         }
+
+        public Compilation Compilation { get; }
 
         public IPropertySymbol PropertySymbol { get; }
 
@@ -20,15 +28,15 @@ namespace TestTools.TypeSystem
 
         public override bool CanWrite => PropertySymbol.SetMethod != null;
 
-        public override TypeDescription DeclaringType => new CompileTimeTypeDescription(PropertySymbol.ContainingType);
+        public override TypeDescription DeclaringType => new CompileTimeTypeDescription(Compilation, PropertySymbol.ContainingType);
 
-        public override MethodDescription GetMethod => PropertySymbol.GetMethod != null ? new CompileTimeMethodDescription(PropertySymbol.GetMethod) : null;
+        public override MethodDescription GetMethod => PropertySymbol.GetMethod != null ? new CompileTimeMethodDescription(Compilation, PropertySymbol.GetMethod) : null;
 
         public override string Name => PropertySymbol.Name;
 
-        public override TypeDescription PropertyType => new CompileTimeTypeDescription(PropertySymbol.Type);
+        public override TypeDescription PropertyType => new CompileTimeTypeDescription(Compilation, PropertySymbol.Type);
 
-        public override MethodDescription SetMethod => PropertySymbol.SetMethod != null ? new CompileTimeMethodDescription(PropertySymbol.SetMethod) : null;
+        public override MethodDescription SetMethod => PropertySymbol.SetMethod != null ? new CompileTimeMethodDescription(Compilation, PropertySymbol.SetMethod) : null;
 
         // Please note, GetCustomAttributes might return fewer results than
         // GetCustomAttributeTypes, because attributes cannot be loaded from 
@@ -50,7 +58,7 @@ namespace TestTools.TypeSystem
 
             for (int i = 0; i < attributes.Length; i++)
             {
-                output.Add(new CompileTimeTypeDescription(attributes[i].AttributeClass));
+                output.Add(new CompileTimeTypeDescription(Compilation, attributes[i].AttributeClass));
             }
 
             return output.ToArray();

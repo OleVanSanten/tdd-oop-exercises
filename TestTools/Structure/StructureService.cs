@@ -72,9 +72,8 @@ namespace TestTools.Structure
 
             if (type.IsArray)
             {
-                throw new NotImplementedException();
-                //Type elementType = TranslateType(type.GetElementType());
-                //return elementType.MakeArrayType();
+                var elementType = TranslateType(type.GetElementType());
+                return elementType.MakeArrayType();
             }
 
             if (type.Namespace == FromNamespace.Name)

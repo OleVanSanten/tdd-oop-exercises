@@ -18,6 +18,8 @@ namespace TestTools.TypeSystem
 
         public abstract ConstructorDescription[] GetConstructors();
 
+        public abstract TypeDescription GetElementType();
+
         public abstract EventDescription[] GetEvents();
 
         public abstract FieldDescription[] GetFields();
@@ -72,6 +74,8 @@ namespace TestTools.TypeSystem
 
             return result;
         }
+
+        public abstract TypeDescription MakeArrayType();
 
         public override bool Equals(object obj)
         {
