@@ -86,12 +86,12 @@ namespace TestTools.Structure
             }
             else translatedType = type;
 
-            /*if (type.IsGenericType)
+            if (type.IsGenericType)
             {
                 // TODO add validation so that TypeArguments must match
-                Type[] typeArguments = type.GetGenericArguments().Select(TranslateType).ToArray();
+                var typeArguments = type.GetGenericArguments().Select(TranslateType).ToArray();
                 return translatedType.GetGenericTypeDefinition().MakeGenericType(typeArguments);
-            }*/
+            }
             return translatedType;
         }
 

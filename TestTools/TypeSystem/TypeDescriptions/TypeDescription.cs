@@ -24,6 +24,10 @@ namespace TestTools.TypeSystem
 
         public abstract FieldDescription[] GetFields();
 
+        public abstract TypeDescription[] GetGenericArguments();
+
+        public abstract TypeDescription GetGenericTypeDefinition();
+
         public abstract TypeDescription[] GetInterfaces();
 
         public virtual MemberDescription[] GetMembers()
@@ -56,6 +60,8 @@ namespace TestTools.TypeSystem
 
         public abstract bool IsEnum { get; }
 
+        public abstract bool IsGenericType { get; }
+
         public abstract bool IsInterface { get; }
 
         public abstract bool IsNotPublic { get; }
@@ -76,6 +82,8 @@ namespace TestTools.TypeSystem
         }
 
         public abstract TypeDescription MakeArrayType();
+
+        public abstract TypeDescription MakeGenericType(params TypeDescription[] typeArguments);
 
         public override bool Equals(object obj)
         {

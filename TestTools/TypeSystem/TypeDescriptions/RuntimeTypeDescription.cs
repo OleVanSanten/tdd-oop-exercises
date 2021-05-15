@@ -40,6 +40,8 @@ namespace TestTools.TypeSystem
 
         public override string Namespace => Type.Namespace;
 
+        public override bool IsGenericType => Type.IsGenericType;
+
         public override ConstructorDescription[] GetConstructors()
         {
             var allConstructors = Type.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
@@ -75,6 +77,20 @@ namespace TestTools.TypeSystem
             return allFields.Select(f => new RuntimeFieldDescription(f)).ToArray();
         }
 
+        public override TypeDescription[] GetGenericArguments()
+        {
+            return Type.GetGenericArguments().Select(t => new RuntimeTypeDescription(t)).ToArray();
+        }
+
+        public override TypeDescription GetGenericTypeDefinition()
+        {
+            if (Type.IsGenericType)
+            {
+                return new RuntimeTypeDescription(Type.GetGenericTypeDefinition());
+            }
+            throw new InvalidOperationException("GetGenericTypeDefinition cannot be performed on non-generic type");
+        }
+
         public override TypeDescription[] GetInterfaces()
         {
             return Type.GetInterfaces().Select(t => new RuntimeTypeDescription(t)).ToArray();
@@ -101,6 +117,16 @@ namespace TestTools.TypeSystem
         public override TypeDescription MakeArrayType()
         {
             return new RuntimeTypeDescription(Type.MakeArrayType());
+        }
+
+        public override TypeDescription MakeGenericType(params TypeDescription[] typeArguments)
+        {
+            if (Type.IsGenericType)
+            {
+                var args = typeArguments.OfType<RuntimeTypeDescription>().Select(t => t.Type).ToArray();
+                return new RuntimeTypeDescription(Type.MakeGenericType(args));
+            }
+            throw new InvalidOperationException("MakeGenericType cannot be performed on non-generic type");
         }
     }
 }

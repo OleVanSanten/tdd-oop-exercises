@@ -57,6 +57,18 @@ namespace TestTools.TypeSystem
 
         public override bool IsSealed => TypeSymbol.IsSealed;
 
+        public override bool IsGenericType
+        {
+            get
+            {
+                if (TypeSymbol is INamedTypeSymbol namedTypeSymbol)
+                {
+                    return namedTypeSymbol.IsGenericType;
+                }
+                return false;
+            }
+        }
+
         public override ConstructorDescription[] GetConstructors()
         {
             var members = TypeSymbol.GetMembers();
@@ -134,6 +146,24 @@ namespace TestTools.TypeSystem
             return output.ToArray();
         }
 
+        public override TypeDescription[] GetGenericArguments()
+        {
+            if (TypeSymbol is INamedTypeSymbol namedTypeSymbol)
+            {
+                return namedTypeSymbol.TypeArguments.Select(t => new CompileTimeTypeDescription(Compilation, t)).ToArray();
+            }
+            return new TypeDescription[0];
+        }
+
+        public override TypeDescription GetGenericTypeDefinition()
+        {
+            if (TypeSymbol is INamedTypeSymbol namedTypeSymbol)
+            {
+                return new CompileTimeTypeDescription(Compilation, namedTypeSymbol.ConstructUnboundGenericType());
+            }
+            throw new InvalidOperationException("GetGenericTypeDefinition cannot be performed on non-generic type");
+        }
+
         public override TypeDescription[] GetInterfaces()
         {
             var interfaces = TypeSymbol.AllInterfaces;
@@ -192,6 +222,16 @@ namespace TestTools.TypeSystem
         {
             var arrayType = Compilation.CreateArrayTypeSymbol(TypeSymbol);
             return new CompileTimeTypeDescription(Compilation, arrayType);
+        }
+
+        public override TypeDescription MakeGenericType(params TypeDescription[] typeArguments)
+        {
+            if (TypeSymbol is INamedTypeSymbol namedTypeSymbol && namedTypeSymbol.IsGenericType)
+            {
+                var args = typeArguments.OfType<CompileTimeTypeDescription>().Select(t => t.TypeSymbol).ToArray();
+                return new CompileTimeTypeDescription(Compilation, namedTypeSymbol.Construct(args));
+            }
+            throw new InvalidOperationException("MakeGenericType cannot be performed on non-generic type");
         }
     }
 }

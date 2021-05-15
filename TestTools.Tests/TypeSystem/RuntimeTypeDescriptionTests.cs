@@ -25,6 +25,39 @@ namespace TestTools_Tests.TypeSystem
             Assert.IsNull(type.GetElementType());
         }
 
+        [TestMethod("GetGenericArguments correctly returns for generic type")]
+        public void GetGenericArguments_CorrectlyReturnsForGenericType()
+        {
+            var type = new RuntimeTypeDescription(typeof(Nullable<int>));
+            var typeArgument1 = new RuntimeTypeDescription(typeof(int));
+
+            Assert.AreEqual(typeArgument1, type.GetGenericArguments()[0]);
+        }
+
+        [TestMethod("GetGenericArguments returns empty array for non-generic type")]
+        public void GetGenericArguments_ReturnsEmptryArrayForNonGenericType()
+        {
+            var type = new RuntimeTypeDescription(typeof(int));
+            Assert.AreEqual(0, type.GetGenericArguments().Length);
+        }
+
+        [TestMethod("GetGenericTypeDefinition correctly returns for generic type")]
+        public void GetGenericTypeDefinition_CorrectlyReturnsForGenericType()
+        {
+            var type = new RuntimeTypeDescription(typeof(Nullable<int>));
+
+            var genericTypeDefinition = type.GetGenericTypeDefinition();
+
+            Assert.AreEqual("Nullable`1", genericTypeDefinition.Name);
+        }
+
+        [TestMethod("GetGenericTypeDefinition throws InvalidOperationException for non-generic type")]
+        public void GetGenericTypeDefinition_ThrowsInvalidOperationExceptionForNonGenericType()
+        {
+            var type = new RuntimeTypeDescription(typeof(int));
+            Assert.ThrowsException<InvalidOperationException>(() => type.GetGenericTypeDefinition());
+        }
+
         [TestMethod("IsArray returns false for non-array type")]
         public void IsArray_ReturnsFalseForNonArrayTypes()
         {
@@ -39,6 +72,20 @@ namespace TestTools_Tests.TypeSystem
             Assert.IsTrue(type.IsArray);
         }
 
+        [TestMethod("IsArray returns false for non-generic type")]
+        public void IsArray_ReturnsFalseForNonGenericType()
+        {
+            var type = new RuntimeTypeDescription(typeof(int));
+            Assert.IsFalse(type.IsGenericType);
+        }
+
+        [TestMethod("IsArray returns true for generic type")]
+        public void IsArray_ReturnsTrueForGenericType()
+        {
+            var type = new RuntimeTypeDescription(typeof(Nullable<int>));
+            Assert.IsTrue(type.IsGenericType);
+        }
+
         [TestMethod("MakeArrayType returns correctly")]
         public void MakeArrayType_ReturnsCorrectly()
         {
@@ -46,6 +93,16 @@ namespace TestTools_Tests.TypeSystem
             var arrayType = new RuntimeTypeDescription(typeof(int[]));
 
             Assert.AreEqual(arrayType, type.MakeArrayType());
+        }
+
+        [TestMethod("MakeGenericType returns correctly")]
+        public void MakeGenericType_ReturnsCorrectly()
+        {
+            var openType = new RuntimeTypeDescription(typeof(Nullable<>));
+            var typeArgument = new RuntimeTypeDescription(typeof(double));
+            var closedType = new RuntimeTypeDescription(typeof(Nullable<double>));
+
+            Assert.AreEqual(closedType, openType.MakeGenericType(typeArgument));
         }
     }
 }
