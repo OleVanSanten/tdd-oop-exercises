@@ -16,12 +16,22 @@ namespace TestTools_Tests
     [TestClass]
     public class TypeRewriterTests
     {
+        class Class
+        {
+            public void GenericMethod<T>()
+            {
+            }
+        }
+
         class ClassA
         {
             public int Field_A;
             public int Property_A { get; set; }
             public event EventHandler Event_A;
             public void Method_A()
+            {
+            }
+            public void GenericMethod_A<T>()
             {
             }
         }
@@ -34,6 +44,13 @@ namespace TestTools_Tests
             public void Method_B()
             {
             }
+            public void GenericMethod_B<T>()
+            {
+            }
+        }
+
+        class GenericClass<T>
+        {
         }
 
         [TestMethod("VisitObjectCreationExpression transforms constructor type")]
@@ -88,7 +105,56 @@ namespace TestTools_Tests
             Assert.AreEqual("value.Method_B()", output.ToFullString());
         }
 
-        // VisitInvocationExpression correctly transforms x.Method<int>()
+        [TestMethod("VisitInvocationExpression transforms name of generic method")]
+        public void VisitInvocationExpression_TransformsNameOfGenericMethod()
+        {
+            // Setting up semantic data
+            var originalType = new RuntimeTypeDescription(typeof(ClassA));
+            var translatedType = new RuntimeTypeDescription(typeof(ClassB));
+            var originalMethod = new RuntimeMethodDescription(typeof(ClassA).GetMethod("GenericMethod_A", new Type[0]).MakeGenericMethod(typeof(int)));
+            var translatedMethod = new RuntimeMethodDescription(typeof(ClassB).GetMethod("GenericMethod_B", new Type[0]).MakeGenericMethod(typeof(int)));
+
+            // Setting up services to handle semantic data
+            var syntaxResolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            var structureService = Substitute.For<IStructureService>();
+
+            syntaxResolver.GetMethodDescription((InvocationExpressionSyntax)null).ReturnsForAnyArgs(originalMethod);
+            structureService.TranslateType(originalType).Returns(translatedType);
+            structureService.TranslateMember(originalMethod).Returns(translatedMethod);
+
+            // Setting up and testing rewriter ouput
+            var rewriter = new TypeRewriter(syntaxResolver, structureService);
+            var input = Parse<InvocationExpressionSyntax>("value.GenericMethod_A<int>()");
+
+            var output = rewriter.VisitInvocationExpression(input);
+
+            Assert.AreEqual("value.GenericMethod_B<Int32>()", output.ToFullString());
+        }
+
+        [TestMethod("VisitInvocationExpression transforms type arguments of generic method ")]
+        public void VisitInvocationExpression_TransformsTypeArgumentsOfGenericMethod()
+        {
+            // Setting up semantic data
+            var type = new RuntimeTypeDescription(typeof(Class));
+            var originalMethod = new RuntimeMethodDescription(typeof(Class).GetMethod("GenericMethod", new Type[0]).MakeGenericMethod(typeof(ClassA)));
+            var translatedMethod = new RuntimeMethodDescription(typeof(Class).GetMethod("GenericMethod", new Type[0]).MakeGenericMethod(typeof(ClassB)));
+
+            // Setting up services to handle semantic data
+            var syntaxResolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            var structureService = Substitute.For<IStructureService>();
+
+            syntaxResolver.GetMethodDescription((InvocationExpressionSyntax)null).ReturnsForAnyArgs(originalMethod);
+            structureService.TranslateType(type).Returns(type);
+            structureService.TranslateMember(originalMethod).Returns(translatedMethod);
+
+            // Setting up and testing rewriter ouput
+            var rewriter = new TypeRewriter(syntaxResolver, structureService);
+            var input = Parse<InvocationExpressionSyntax>("value.GenericMethod<ClassA>()");
+
+            var output = rewriter.VisitInvocationExpression(input);
+
+            Assert.AreEqual("value.GenericMethod<ClassB>()", output.ToFullString());
+        }
 
         [TestMethod("VisitMemberAccessExpression transforms event name")]
         public void VisitMemberAccessExpression_TransformsEventName()
@@ -167,9 +233,8 @@ namespace TestTools_Tests
 
             Assert.AreEqual("value.Property_B", output.ToFullString());
         }
-
-        // This tests fails right now as 
-        // [TestMethod("VisitVariableDeclaration transforms variable type")]
+ 
+        [TestMethod("VisitVariableDeclaration transforms variable type")]
         public void VisitVariableDeclaration_TransformsVariableType()
         {
             // Setting up semantic data VariableDeclarationSyntax.ToString() does not add whitespace
@@ -187,9 +252,34 @@ namespace TestTools_Tests
             var rewriter = new TypeRewriter(syntaxResolver, structureService);
             var input = Parse<VariableDeclarationSyntax>("ClassA value");
 
-            var output = rewriter.VisitVariableDeclaration(input);
+            var output = (VariableDeclarationSyntax)rewriter.VisitVariableDeclaration(input);
 
-            Assert.AreEqual("ClassB value", output.ToFullString());
+            Assert.AreEqual("ClassB", output.Type.ToFullString());
+            Assert.AreEqual("value", output.Variables.ToFullString());
+        }
+
+        [TestMethod("VisitVariableDeclaration transforms type arguments of variable type")]
+        public void VisitVariableDeclaration_TransformsTypeArgumentsOfVariableType()
+        {
+            // Setting up semantic data VariableDeclarationSyntax.ToString() does not add whitespace
+            var originalType = new RuntimeTypeDescription(typeof(GenericClass<ClassA>));
+            var translatedType = new RuntimeTypeDescription(typeof(GenericClass<ClassB>));
+
+            // Setting up services to handle semantic data
+            var syntaxResolver = Substitute.For<ICompileTimeDescriptionResolver>();
+            var structureService = Substitute.For<IStructureService>();
+
+            syntaxResolver.GetTypeDescription((VariableDeclarationSyntax)null).ReturnsForAnyArgs(originalType);
+            structureService.TranslateType(originalType).Returns(translatedType);
+
+            // Setting up and testing rewriter ouput
+            var rewriter = new TypeRewriter(syntaxResolver, structureService);
+            var input = Parse<VariableDeclarationSyntax>("GenericClass<ClassA> value");
+
+            var output = (VariableDeclarationSyntax)rewriter.VisitVariableDeclaration(input);
+
+            Assert.AreEqual("GenericClass<ClassB>", output.Type.ToFullString());
+            Assert.AreEqual("value", output.Variables.ToFullString());
         }
 
         private T Parse<T>(string source) where T : SyntaxNode

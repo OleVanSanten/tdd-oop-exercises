@@ -82,15 +82,7 @@ namespace TestTools.Structure
 
             // Potentially rewritting expression and method name 
             var translatedMethod = _structureService.TranslateMember(originalMethod);
-            SimpleNameSyntax newName;
-            if (memberExpression.Name is GenericNameSyntax genericNameSyntax)
-            {
-                var newTypeArguments = SyntaxFactory.SeparatedList(genericNameSyntax.TypeArgumentList.Arguments.Select(Visit).OfType<TypeSyntax>());
-                var newTypeArgumentList= SyntaxFactory.TypeArgumentList(newTypeArguments);
-                newName = SyntaxFactory.GenericName(SyntaxFactory.Identifier(translatedMethod.Name), newTypeArgumentList); 
-            }
-            else newName = SyntaxFactory.IdentifierName(translatedMethod.Name);
-
+            var newName = GetNameSyntax((MethodDescription)translatedMethod);
             var newMemberExpression = (MemberAccessExpressionSyntax)Visit(memberExpression);
             var newExpression = newMemberExpression.WithName(newName);
 
@@ -101,6 +93,7 @@ namespace TestTools.Structure
             return node.WithExpression(newExpression).WithArgumentList(newArgumentList);
         }
 
+        
         public override SyntaxNode VisitMemberAccessExpression(MemberAccessExpressionSyntax node)
         {
             var originalMember = _resolver.GetMemberDescription(node);
@@ -152,12 +145,44 @@ namespace TestTools.Structure
 
             // Potentially rewritting type
             var translatedType = _structureService.TranslateType(originalType);
-            var newType = SyntaxFactory.ParseTypeName(translatedType.Name);
+            var newType = GetTypeSyntax(translatedType);
 
             // Potentially rewritting variable declators
             var newVariables = SyntaxFactory.SeparatedList(node.Variables.Select(Visit).OfType<VariableDeclaratorSyntax>());
             
             return node.WithType(newType).WithVariables(newVariables);
+        }
+
+        private SimpleNameSyntax GetNameSyntax(MethodDescription methodDescription)
+        {
+            if (methodDescription.IsGenericMethod)
+            {
+                var methodName = SyntaxFactory.Identifier(methodDescription.Name);
+                var typeArguments = methodDescription.GetGenericArguments().Select(t => GetTypeSyntax(t)).ToArray();
+                var seperatedList = SyntaxFactory.SeparatedList(typeArguments);
+                var typeArgumentList = SyntaxFactory.TypeArgumentList(seperatedList);
+
+                return SyntaxFactory.GenericName(methodName, typeArgumentList);
+            }
+            return SyntaxFactory.IdentifierName(methodDescription.Name); ;
+        }
+
+        private TypeSyntax GetTypeSyntax(TypeDescription typeDescription)
+        {
+            if (typeDescription.IsGenericType)
+            {
+                // Compiler is to add ` to indicate arity for generic types, however as this is not part
+                // of return C# syntax it and all subsquent characters are removed
+                var litteralTypeName = typeDescription.Name.Split('`').First();
+
+                var typeName = SyntaxFactory.Identifier(litteralTypeName);
+                var typeArguments = typeDescription.GetGenericArguments().Select(t => GetTypeSyntax(t)).ToArray();
+                var seperatedList = SyntaxFactory.SeparatedList(typeArguments);
+                var typeArgumentList = SyntaxFactory.TypeArgumentList(seperatedList);
+
+                return SyntaxFactory.GenericName(typeName, typeArgumentList);
+            }
+            return SyntaxFactory.ParseTypeName(typeDescription.Name);
         }
     }
 }
