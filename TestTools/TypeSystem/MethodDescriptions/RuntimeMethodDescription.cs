@@ -38,6 +38,8 @@ namespace TestTools.TypeSystem
 
         public override TypeDescription ReturnType => new RuntimeTypeDescription(MethodInfo.ReturnType);
 
+        public override bool IsGenericMethod => MethodInfo.IsGenericMethod;
+
         public override Attribute[] GetCustomAttributes()
         {
             return MethodInfo.GetCustomAttributes().ToArray();
@@ -48,9 +50,24 @@ namespace TestTools.TypeSystem
             return attributes.Select(t => new RuntimeTypeDescription(t.GetType())).ToArray();
         }
 
+        public override TypeDescription[] GetGenericArguments()
+        {
+            return MethodInfo.GetGenericArguments().Select(t => new RuntimeTypeDescription(t)).ToArray();
+        }
+
         public override ParameterDescription[] GetParameters()
         {
             return MethodInfo.GetParameters().Select(i => new RuntimeParameterDescription(i)).ToArray();
+        }
+
+        public override MethodDescription MakeGenericMethod(params TypeDescription[] typeArguments)
+        {
+            if (MethodInfo.IsGenericMethod)
+            {
+                var args = typeArguments.OfType<RuntimeTypeDescription>().Select(t => t.Type).ToArray();
+                return new RuntimeMethodDescription(MethodInfo.MakeGenericMethod(args));
+            }
+            throw new InvalidOperationException("MakeGenericMethod cannot be performed on non-generic method");
         }
     }
 }

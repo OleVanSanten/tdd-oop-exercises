@@ -12,6 +12,8 @@ namespace TestTools.TypeSystem
 
         public abstract bool IsAssembly { get; }
 
+        public abstract bool IsGenericMethod { get; }
+
         public abstract bool IsFamily { get; }
 
         public abstract bool IsPrivate { get; }
@@ -21,6 +23,8 @@ namespace TestTools.TypeSystem
         public abstract bool IsStatic { get; }
 
         public abstract bool IsVirtual { get; }
+
+        public abstract TypeDescription[] GetGenericArguments();
 
         public abstract ParameterDescription[] GetParameters();
     }

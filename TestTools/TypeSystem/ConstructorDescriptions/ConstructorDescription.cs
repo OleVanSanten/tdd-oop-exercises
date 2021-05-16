@@ -8,6 +8,13 @@ namespace TestTools.TypeSystem
     {
         // TODO add Attributes
 
+        public override bool IsGenericMethod => false;
+
         public override MemberTypes MemberType => MemberTypes.Constructor;
+
+        public override TypeDescription[] GetGenericArguments()
+        {
+            return new TypeDescription[0];
+        }
     }
 }

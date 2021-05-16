@@ -72,6 +72,8 @@ namespace TestTools.TypeSystem
 
         public override TypeDescription ReturnType => new CompileTimeTypeDescription(Compilation, MethodSymbol.ReturnType);
 
+        public override bool IsGenericMethod => MethodSymbol.IsGenericMethod;
+
         // Please note, GetCustomAttributes might return fewer results than
         // GetCustomAttributeTypes, because attributes cannot be loaded from 
         // non .netstandard2.0 targeting assemblies
@@ -97,6 +99,11 @@ namespace TestTools.TypeSystem
             return output.ToArray();
         }
 
+        public override TypeDescription[] GetGenericArguments()
+        {
+            return MethodSymbol.TypeArguments.Select(t => new CompileTimeTypeDescription(Compilation, t)).ToArray();
+        }
+
         public override ParameterDescription[] GetParameters()
         {
             var parameters = MethodSymbol.Parameters;
@@ -108,6 +115,16 @@ namespace TestTools.TypeSystem
             }
 
             return output.ToArray();
+        }
+
+        public override MethodDescription MakeGenericMethod(params TypeDescription[] typeArguments)
+        {
+            if (MethodSymbol.IsGenericMethod)
+            {
+                var args = typeArguments.OfType<CompileTimeTypeDescription>().Select(t => t.TypeSymbol).ToArray();
+                return new CompileTimeMethodDescription(Compilation, MethodSymbol.Construct(args));
+            }
+            throw new InvalidOperationException("MakeGenericMethod cannot be performed on non-generic method");
         }
     }
 }

@@ -24,18 +24,13 @@ namespace TestTools.Structure
                 foreach (var methodBase2 in matchingMembers.OfType<MethodBaseDescription>())
                 {
                     // TODO Try to do this somewhat simpler 
-                    /*var methodBase3 = methodBase2;
-
+                    var methodBase3 = methodBase2;
+                    
                     if (methodBase2.IsGenericMethod)
-                        methodBase3 = ((MethodInfo)methodBase2).MakeGenericMethod(methodBase1.GetGenericArguments());
+                        methodBase3 = ((MethodDescription)methodBase2).MakeGenericMethod(methodBase1.GetGenericArguments());
 
                     var parameterTypes1 = methodBase1.GetParameters().Select(p => p.ParameterType);
                     var parameterTypes2 = methodBase3.GetParameters().Select(p => p.ParameterType);
-
-                    if (parameterTypes1.SequenceEqual(parameterTypes2))
-                        return methodBase2;*/
-                    var parameterTypes1 = methodBase1.GetParameters().Select(p => p.ParameterType);
-                    var parameterTypes2 = methodBase2.GetParameters().Select(p => p.ParameterType);
 
                     if (parameterTypes1.SequenceEqual(parameterTypes2))
                         return methodBase2;
