@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using TestTools.Structure.Attributes;
-using TestTools.Syntax;
+using OleVanSanten.TestTools.Structure.Attributes;
+using OleVanSanten.TestTools.Syntax;
 
 namespace Lecture_3_Solutions
 {

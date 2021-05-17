@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using TestTools.Structure.Attributes;
+using OleVanSanten.TestTools.Structure.Attributes;
 
 namespace Lecture_3_Solutions
 {

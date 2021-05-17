@@ -1,4 +1,4 @@
-﻿using TestTools.MSTest;
+﻿using OleVanSanten.TestTools.MSTest;
 
 namespace Lecture_3_Tests
 {
