@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
-using TestTools;
-using TestTools.MSTest;
+using OleVanSanten.TestTools;
+using OleVanSanten.TestTools.MSTest;
 
 namespace Lecture_2_Tests
 {
@@ -16,8 +16,6 @@ namespace Lecture_2_Tests
             Lecture_2.Program.Main(new string[0]);
         }
 
-
-        // public static TestFactory Factory { get; } = new TestFactory("Lecture_2_Solutions", "Lecture_2_Solutions");
         public static TestFactory Factory { get; } = TestFactory.CreateFromConfigurationFile("./../../../TestToolsConfig.xml");
     }
 }
