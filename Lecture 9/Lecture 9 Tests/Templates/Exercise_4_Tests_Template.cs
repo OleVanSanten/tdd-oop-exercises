@@ -2,11 +2,11 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using TestTools.Expressions;
-using TestTools.MSTest;
-using TestTools.Structure;
+using OleVanSanten.TestTools.Expressions;
+using OleVanSanten.TestTools.MSTest;
+using OleVanSanten.TestTools.Structure;
 using static Lecture_9_Tests.TestHelper;
-using static TestTools.Expressions.TestExpression;
+using static OleVanSanten.TestTools.Expressions.TestExpression;
 
 namespace Lecture_9_Tests
 {
