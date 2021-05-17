@@ -1,12 +1,12 @@
 ﻿using Lecture_4_Solutions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using TestTools.Expressions;
-using TestTools.MSTest;
-using TestTools.Structure;
-using static TestTools.Expressions.TestExpression;
+using OleVanSanten.TestTools.Expressions;
+using OleVanSanten.TestTools.MSTest;
+using OleVanSanten.TestTools.Structure;
+using static OleVanSanten.TestTools.Expressions.TestExpression;
 using static Lecture_4_Tests.TestHelper;
-using static TestTools.Helpers.StructureHelper;
+using static OleVanSanten.TestTools.Helpers.StructureHelper;
 
 namespace Lecture_4_Tests
 {
@@ -87,7 +87,7 @@ namespace Lecture_4_Tests
         #endregion
 
         #region Exercise 2C
-        [TemplatedTestMethod("Person.GetClassification() returns \"under-weight\" for Height = 1.64 & Weight = 47.0"), TestCategory("Exercise 2C")]
+        [TemplatedTestMethod("a. Person.GetClassification() returns \"under-weight\" for Height = 1.64 & Weight = 47.0"), TestCategory("Exercise 2C")]
         public void PersonGetClassificationReturnsUnderWeight()
         {
             Person person = new Person("abc")
@@ -99,7 +99,7 @@ namespace Lecture_4_Tests
             Assert.AreEqual("under-weight", person.GetClassification());
         }
 
-        [TemplatedTestMethod("Person.GetClassification() returns \"normal weight\" for Height = 1.73 & Weight = 58.0"), TestCategory("Exercise 2C")]
+        [TemplatedTestMethod("b. Person.GetClassification() returns \"normal weight\" for Height = 1.73 & Weight = 58.0"), TestCategory("Exercise 2C")]
         public void PersonGetClassificationReturnsNormalWeight()
         {
             Person person = new Person("abc")
@@ -111,7 +111,7 @@ namespace Lecture_4_Tests
             Assert.AreEqual("normal weight", person.GetClassification());
         }
 
-        [TemplatedTestMethod("Person.GetClassification() returns \"over-weight\" for Height = 1.70 & Weight = 74.0"), TestCategory("Exercise 2C")]
+        [TemplatedTestMethod("c. Person.GetClassification() returns \"over-weight\" for Height = 1.70 & Weight = 74.0"), TestCategory("Exercise 2C")]
         public void PersonGetClassificationReturnsOverWeight()
         {
             Person person = new Person("abc")
@@ -123,7 +123,7 @@ namespace Lecture_4_Tests
             Assert.AreEqual("over-weight", person.GetClassification());
         }
 
-        [TemplatedTestMethod("Person.GetClassification() returns \"obese\" for Height = 1.85 & Weight = 120.0"), TestCategory("Exercise 2C")]
+        [TemplatedTestMethod("d. Person.GetClassification() returns \"obese\" for Height = 1.85 & Weight = 120.0"), TestCategory("Exercise 2C")]
         public void PersonGetClassificationReturnsObese()
         {
             Person person = new Person("abc")

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using TestTools;
-using TestTools.Expressions;
-using TestTools.MSTest;
+using OleVanSanten.TestTools;
+using OleVanSanten.TestTools.Expressions;
+using OleVanSanten.TestTools.MSTest;
 using System.Linq.Expressions;
 
 namespace Lecture_4_Tests
