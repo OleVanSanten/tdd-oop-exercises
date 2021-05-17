@@ -1,11 +1,11 @@
 ﻿using Lecture_7_Solutions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using TestTools.Expressions;
-using TestTools.MSTest;
-using TestTools.Structure;
+using OleVanSanten.TestTools.Expressions;
+using OleVanSanten.TestTools.MSTest;
+using OleVanSanten.TestTools.Structure;
 using static Lecture_7_Tests.TestHelper;
-using static TestTools.Expressions.TestExpression;
+using static OleVanSanten.TestTools.Expressions.TestExpression;
 
 namespace Lecture_7_Tests
 {
