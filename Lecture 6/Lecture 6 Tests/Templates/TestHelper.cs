@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq.Expressions;
-using TestTools;
-using TestTools.MSTest;
+using OleVanSanten.TestTools;
+using OleVanSanten.TestTools.MSTest;
 
 namespace Lecture_6_Tests
 {

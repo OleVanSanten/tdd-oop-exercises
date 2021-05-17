@@ -4,12 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using TestTools.Structure;
-using TestTools.Expressions;
-using static TestTools.Expressions.TestExpression;
+using OleVanSanten.TestTools.Structure;
+using OleVanSanten.TestTools.Expressions;
+using static OleVanSanten.TestTools.Expressions.TestExpression;
 using static Lecture_6_Tests.TestHelper;
-using static TestTools.Helpers.StructureHelper;
-using TestTools.MSTest;
+using static OleVanSanten.TestTools.Helpers.StructureHelper;
+using OleVanSanten.TestTools.MSTest;
 using System.IO.Abstractions;
 
 namespace Lecture_6_Tests
