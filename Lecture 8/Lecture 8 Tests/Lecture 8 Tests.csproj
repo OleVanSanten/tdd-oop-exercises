@@ -15,19 +15,17 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="OleVanSanten.TestTools" Version="1.0.2" />
+    <PackageReference Include="OleVanSanten.TestTools.Generator" Version="1.0.3" />
+    <PackageReference Include="OleVanSanten.TestTools.MSTest" Version="1.0.0" />
   </ItemGroup>
 
   <!-- Adds TestTools.Generator as source generator -->
   <ItemGroup>
-    <ProjectReference Include="..\..\TestTools.Generator\TestTools.Generator.csproj"
-                      OutputItemType="Analyzer"
-                      ReferenceOutputAssembly="false" />
-    <AdditionalFiles Include="TestToolsConfig.xml" UnitTestGenerator_IsConfig="true"/>
+    <AdditionalFiles Include="TestToolsConfig.xml" UnitTestGenerator_IsConfig="true" />
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\..\TestTools.MSTest\TestTools.MSTest.csproj" />
-    <ProjectReference Include="..\..\TestTools\TestTools.csproj" />
     <ProjectReference Include="..\Lecture 8 Exercises\Lecture 8 Exercises.csproj" />
     <ProjectReference Include="..\Lecture 8 Solutions\Lecture 8 Solutions.csproj" />
   </ItemGroup>

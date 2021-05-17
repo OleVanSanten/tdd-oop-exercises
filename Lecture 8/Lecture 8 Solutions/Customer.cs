@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
-using TestTools.Syntax;
+using OleVanSanten.TestTools.Syntax;
 
 namespace Lecture_8_Solutions
 {
