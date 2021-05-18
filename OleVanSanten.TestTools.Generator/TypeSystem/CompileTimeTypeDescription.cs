@@ -157,9 +157,10 @@ namespace OleVanSanten.TestTools.TypeSystem
 
         public override TypeDescription GetGenericTypeDefinition()
         {
-            if (TypeSymbol is INamedTypeSymbol namedTypeSymbol)
+            if (TypeSymbol is INamedTypeSymbol namedTypeSymbol && namedTypeSymbol.IsGenericType)
             {
-                return new CompileTimeTypeDescription(Compilation, namedTypeSymbol.ConstructUnboundGenericType());
+                // Based on https://stackoverflow.com/questions/28240167/correct-way-to-check-the-type-of-an-expression-in-roslyn-analyzer
+                return new CompileTimeTypeDescription(Compilation, namedTypeSymbol.OriginalDefinition);
             }
             throw new InvalidOperationException("GetGenericTypeDefinition cannot be performed on non-generic type");
         }

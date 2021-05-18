@@ -3,7 +3,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>preview</LangVersion>
     <PackageId>OleVanSanten.TestTools.Generator</PackageId>
-    <Version>1.0.4</Version>
+    <Version>1.0.5</Version>
     <Authors>Ole van Santen</Authors>
     <Company>OleVanSanten</Company>
 
