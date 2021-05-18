@@ -16,7 +16,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="OleVanSanten.TestTools" Version="1.0.4" />
-    <PackageReference Include="OleVanSanten.TestTools.Generator" Version="1.0.4" />
+    <PackageReference Include="OleVanSanten.TestTools.Generator" Version="1.0.5" />
     <PackageReference Include="OleVanSanten.TestTools.MSTest" Version="1.0.0" />
   </ItemGroup>
 

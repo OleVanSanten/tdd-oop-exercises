@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="OleVanSanten.TestTools" Version="1.0.2" />
+    <PackageReference Include="OleVanSanten.TestTools" Version="1.0.4" />
   </ItemGroup>
 
 </Project>
