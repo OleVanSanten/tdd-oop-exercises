@@ -43,6 +43,9 @@ namespace OleVanSanten.TestTools.Structure
             var originalType = new RuntimeTypeDescription(node.Type);
             var originalConstructor = new RuntimeConstructorDescription(node.Constructor);
 
+            if (!_structureService.IsTranslatableType(originalType))
+                return base.VisitNew(node);
+
             _structureService.VerifyType(originalType, TypeVerifiers);
             _structureService.VerifyMember(
                 originalConstructor,
@@ -58,6 +61,9 @@ namespace OleVanSanten.TestTools.Structure
         {
             var originalType = new RuntimeTypeDescription(node.Type);
             var originalMethod = new RuntimeMethodDescription(node.Method);
+
+            if (!_structureService.IsTranslatableType(originalType))
+                return base.VisitMethodCall(node);
 
             _structureService.VerifyType(originalType, TypeVerifiers);
             _structureService.VerifyMember(
@@ -106,6 +112,9 @@ namespace OleVanSanten.TestTools.Structure
             var factory = new RuntimeDescriptionFactory();
             var originalMember = factory.Create(node.Member);
 
+            if (!_structureService.IsTranslatableType(originalType))
+                return base.VisitMember(node);
+
             _structureService.VerifyType(originalType, TypeVerifiers);
             _structureService.VerifyMember(originalMember, MemberVerifiers, MemberVerificationAspect.MemberType);
 
@@ -146,6 +155,9 @@ namespace OleVanSanten.TestTools.Structure
             var factory = new RuntimeDescriptionFactory();
             var originalMember = factory.Create(node.Member);
 
+            if (!_structureService.IsTranslatableType(originalType))
+                return base.VisitMemberAssignment(node);
+
             _structureService.VerifyType(originalType, TypeVerifiers);
             _structureService.VerifyMember(originalMember, MemberVerifiers, MemberVerificationAspect.MemberType);
 
@@ -185,6 +197,9 @@ namespace OleVanSanten.TestTools.Structure
         protected override Expression VisitParameter(ParameterExpression node)
         {
             var originalType = new RuntimeTypeDescription(node.Type);
+
+            if (!_structureService.IsTranslatableType(originalType))
+                return base.VisitParameter(node);
 
             _structureService.VerifyType(originalType, TypeVerifiers);
 

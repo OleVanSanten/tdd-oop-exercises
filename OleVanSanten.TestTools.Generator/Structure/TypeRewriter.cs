@@ -46,6 +46,9 @@ namespace OleVanSanten.TestTools.Structure
             var originalConstructor = _resolver.GetConstructorDescription(node);
             var originalType = originalConstructor.DeclaringType;
 
+            if (!_structureService.IsTranslatableType(originalType))
+                return base.VisitObjectCreationExpression(node);
+
             _structureService.VerifyType(originalType, TypeVerifiers);
             _structureService.VerifyMember(
                 originalConstructor,
@@ -67,6 +70,9 @@ namespace OleVanSanten.TestTools.Structure
 
             var originalMethod = _resolver.GetMethodDescription(node);
             var originalType = originalMethod.DeclaringType;
+
+            if (!_structureService.IsTranslatableType(originalType))
+                return base.VisitInvocationExpression(node);
 
             _structureService.VerifyType(originalType, TypeVerifiers);
             _structureService.VerifyMember(
@@ -98,6 +104,9 @@ namespace OleVanSanten.TestTools.Structure
         {
             var originalMember = _resolver.GetMemberDescription(node);
             var originalType = originalMember.DeclaringType;
+
+            if (!_structureService.IsTranslatableType(originalType))
+                return base.VisitMemberAccessExpression(node);
 
             _structureService.VerifyType(originalType, TypeVerifiers);
             if (originalMember is EventDescription)
@@ -140,6 +149,9 @@ namespace OleVanSanten.TestTools.Structure
         public override SyntaxNode VisitVariableDeclaration(VariableDeclarationSyntax node)
         {
             var originalType = _resolver.GetTypeDescription(node);
+
+            if (!_structureService.IsTranslatableType(originalType))
+                return base.VisitVariableDeclaration(node);
 
             _structureService.VerifyType(originalType, TypeVerifiers);
 

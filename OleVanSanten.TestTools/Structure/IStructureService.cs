@@ -8,6 +8,8 @@ namespace OleVanSanten.TestTools.Structure
 {
     public interface IStructureService
     {
+        bool IsTranslatableType(TypeDescription type);
+
         TypeDescription TranslateType(TypeDescription type);
 
         MemberDescription TranslateMember(MemberDescription memberInfo);
