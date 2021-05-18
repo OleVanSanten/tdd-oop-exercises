@@ -20,8 +20,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="OleVanSanten.TestTools" Version="1.0.2" />
-    <PackageReference Include="OleVanSanten.TestTools.Generator" Version="1.0.3" />
+    <PackageReference Include="OleVanSanten.TestTools" Version="1.0.4" />
+    <PackageReference Include="OleVanSanten.TestTools.Generator" Version="1.0.4" />
     <PackageReference Include="OleVanSanten.TestTools.MSTest" Version="1.0.0" />
     <PackageReference Include="System.Runtime" Version="4.3.1" />
   </ItemGroup>
